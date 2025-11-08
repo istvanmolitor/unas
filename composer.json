@@ -1,0 +1,29 @@
+{
+    "name": "istvanmolitor/unas",
+    "description": "UNAS",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Molitor István",
+            "email": "istvanmolitor@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "ext-simplexml": "*",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Molitor\\Unas\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Molitor\\Unas\\Providers\\UnasServiceProvider"
+            ]
+        }
+    }
+}
