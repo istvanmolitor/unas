@@ -12,7 +12,8 @@
     "minimum-stability": "dev",
     "require": {
         "ext-simplexml": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "istvanmolitor/product": "*@dev"
     },
     "autoload": {
         "psr-4": {
