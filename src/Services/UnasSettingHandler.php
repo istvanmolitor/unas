@@ -1,0 +1,41 @@
+<?php
+
+namespace Molitor\Unas\Services;
+
+use Molitor\Setting\Services\SettingForm;
+use Filament\Forms\Components\Toggle;
+
+class UnasSettingHandler extends SettingForm
+{
+
+    public function getSlug(): string
+    {
+        return 'unas';
+    }
+
+    public function getForm(): array
+    {
+        return [
+            Toggle::make('unas_enabled')->label('Engedélyezve')->default(true),
+        ];
+    }
+
+    public function getLabel(): string
+    {
+        return 'UNAS';
+    }
+
+    public function getFormFields(): array
+    {
+        return [
+            'unas_enabled',
+        ];
+    }
+
+    public function getDefaults(): array
+    {
+        return [
+            'unas_enabled' => false,
+        ];
+    }
+}
