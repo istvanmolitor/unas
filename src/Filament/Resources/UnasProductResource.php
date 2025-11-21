@@ -22,18 +22,6 @@ class UnasProductResource extends Resource
 {
     protected static ?string $model = UnasProduct::class;
 
-    protected static \BackedEnum|null|string $navigationIcon = 'heroicon-o-cube';
-
-    public static function getNavigationGroup(): string
-    {
-        return 'UNAS';
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return 'UNAS termékek';
-    }
-
     public static function shouldRegisterNavigation(): bool
     {
         return false;

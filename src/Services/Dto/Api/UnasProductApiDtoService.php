@@ -95,7 +95,7 @@ class UnasProductApiDtoService extends UnasService
             $productCategoryDto = new ProductCategoryDto();
             $productCategoryDto->id = $category['Id'];
             $productCategoryDto->path->separator = '|';
-            $productCategoryDto->path->set($defaultLanguage, $category['Name'] ?? null);
+            $productCategoryDto->path->setPath($defaultLanguage, $category['Name'] ?? null);
             $productCategoryDto->path->separator = '/';
             $productDto->addCategory($productCategoryDto);
         }

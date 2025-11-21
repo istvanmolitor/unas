@@ -2,10 +2,11 @@
 
 namespace Molitor\Unas\Services;
 
+use Illuminate\Support\Facades\Gate;
 use Molitor\Setting\Services\SettingForm;
 use Filament\Forms\Components\Toggle;
 
-class UnasSettingHandler extends SettingForm
+class UnasSettingForm extends SettingForm
 {
 
     public function getSlug(): string
@@ -23,6 +24,11 @@ class UnasSettingHandler extends SettingForm
     public function getLabel(): string
     {
         return 'UNAS';
+    }
+
+    public function canAccess(): bool
+    {
+        return parent::canAccess() && Gate::allows('acl', 'unas');
     }
 
     public function getFormFields(): array

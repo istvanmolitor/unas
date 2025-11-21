@@ -268,4 +268,8 @@ class UnasProductCategoryService extends UnasService
         $productCategory->changed = true;
         $productCategory->save();
     }
+
+    private function createShopCategory(UnasShop $shop, array $path)
+    {
+    }
 }
