@@ -29,7 +29,7 @@ class UnasProductResource extends Resource
 
     public static function canAccess(): bool
     {
-        return Gate::allows('acl', 'unas') && request()->has('warehouse_id');
+        return Gate::allows('acl', 'unas');
     }
 
     public static function form(Schema $schema): Schema
