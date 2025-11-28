@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
 use Molitor\Unas\Filament\Resources\UnasProductResource;
+use Molitor\Unas\Models\UnasShop;
+use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
 use Molitor\Unas\Services\UnasProductService;
 
@@ -48,6 +50,27 @@ class ListUnasProducts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('copy_all_products')
+                ->label('Összes termék átmásolása')
+                ->icon('heroicon-o-document-duplicate')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Összes termék átmásolása')
+                ->modalDescription('Biztosan át szeretnéd másolni az összes terméket a termék törzsbe?')
+                ->modalSubmitActionLabel('Átmásolás')
+                ->action(function () {
+                    /** @var UnasProductService $service */
+                    $service = app(UnasProductService::class);
+
+                    /** @var UnasProductRepositoryInterface $unasProductRepository */
+                    $count = $service->copyAllProduct(UnasShop::findOrFail($this->unasShopId));
+
+                    Notification::make()
+                        ->title(__('unas::product.copying_in_progress', ['count' => $count]))
+                        ->success()
+                        ->send();
+                })
+                ->visible(fn () => $this->unasShopId !== null),
             CreateAction::make()->label('Új UNAS termék')->url(fn () => UnasProductResource::getUrl(
                 'create',
                 ['shop_id' => $this->unasShopId]

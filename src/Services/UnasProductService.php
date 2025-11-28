@@ -57,6 +57,15 @@ class UnasProductService extends UnasService
         return $this->productUnitRepository->getByShortName($name);
     }
 
+    public function copyAllProduct(UnasShop $shop): int
+    {
+        $products = $this->unasProductRepository->getShopProducts($shop);
+        $products->each(function ($record) {
+            $this->copyToProduct($record);
+        });
+        return $products->count();
+    }
+
     private function findExistedProduct(UnasShop $unasShop, int $remoteId, ProductDto $productDto): UnasProduct|null
     {
         if($remoteId) {
