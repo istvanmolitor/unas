@@ -19,6 +19,8 @@ class CreateUnasShopsTable extends Migration
             $table->string('domain');
             $table->string('name');
             $table->string('api_key');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
             $table->timestamps();
         });
     }
