@@ -8,6 +8,7 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
+use Molitor\Unas\Filament\Resources\UnasProductResource;
 use Molitor\Unas\Filament\Resources\UnasShopResource;
 
 class ViewUnasShop extends ViewRecord
@@ -61,7 +62,9 @@ class ViewUnasShop extends ViewRecord
                             ->state(fn ($record) => $record->shopProductCategories()->count()),
                         TextEntry::make('shopProducts_count')
                             ->label('Termékek száma')
-                            ->state(fn ($record) => $record->shopProducts()->count()),
+                            ->state(fn ($record) => $record->shopProducts()->count())
+                            ->url(fn ($record) => UnasProductResource::getUrl('index', ['shop_id' => $record->getKey()]))
+                            ->color('primary'),
                         TextEntry::make('shopProductParameters_count')
                             ->label('Termék paraméterek száma')
                             ->state(fn ($record) => $record->shopProductParameters()->count()),

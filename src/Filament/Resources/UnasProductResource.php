@@ -100,6 +100,11 @@ class UnasProductResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('unas_shop_id')
+                    ->relationship('shop', 'name')
+                    ->label(__('unas::common.shop'))
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 ViewAction::make(),
