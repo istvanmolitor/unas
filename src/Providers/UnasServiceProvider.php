@@ -4,6 +4,7 @@ namespace Molitor\Unas\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Molitor\Product\Events\ProductUpdateEvent;
+use Molitor\Setting\Services\SettingHandlerService;
 use Molitor\Unas\Console\Commands\UnasDownloadProducts;
 use Molitor\Unas\Console\Commands\UnasRepairCommand;
 use Molitor\Unas\Console\Commands\UnasSync;
@@ -22,6 +23,7 @@ use Molitor\Unas\Repositories\UnasProductRepository;
 use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 use Molitor\Unas\Repositories\UnasShopRepository;
 use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
+use Molitor\Unas\Services\UnasSettingForm;
 
 class UnasServiceProvider extends EventServiceProvider
 {
@@ -41,6 +43,8 @@ class UnasServiceProvider extends EventServiceProvider
             UnasSync::class,
             UnasDownloadProducts::class,
         ]);
+
+        $this->app->make(SettingHandlerService::class)->register(UnasSettingForm::class);
     }
 
     public function register()
