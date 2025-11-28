@@ -8,6 +8,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Table;
 use Molitor\Unas\Filament\Resources\UnasProductResource;
@@ -46,6 +47,7 @@ class ListUnasShops extends ListRecords
                     ->url(function ($record) {
                         return 'unas-products?shop_id=' . $record->getKey();
                     }),
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

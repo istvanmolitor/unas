@@ -93,6 +93,7 @@ class UnasShopResource extends Resource
         return [
             'index' => Pages\ListUnasShops::route('/'),
             'create' => Pages\CreateUnasShop::route('/create'),
+            'view' => Pages\ViewUnasShop::route('/{record}'),
             'edit' => Pages\EditUnasShop::route('/{record}/edit'),
         ];
     }
