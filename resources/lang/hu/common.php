@@ -27,5 +27,6 @@ return [
     'sync_product' => 'Termék szinkronizálása',
     'copy_to_product' => 'Másolás a termékek közé',
     'stock' => 'Készlet',
+    'warehouse' => 'Raktál',
     'copy_to_products_confirm' => 'Biztosan át szeretnéd másolni a kijelölt UNAS termékeket a termékek közé?',
 ];

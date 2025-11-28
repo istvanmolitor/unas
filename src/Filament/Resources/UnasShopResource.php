@@ -54,6 +54,12 @@ class UnasShopResource extends Resource
                 ->label('API kulcs')
                 ->required()
                 ->maxLength(255),
+            Forms\Components\Select::make('warehouse_id')
+                ->label(__('unas::common.warehouse'))
+                ->relationship('warehouse', 'name')
+                ->required()
+                ->searchable()
+                ->preload(),
         ])->columns(1);
     }
 
