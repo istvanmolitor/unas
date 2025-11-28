@@ -67,6 +67,9 @@ class UnasProductResource extends Resource
             Forms\Components\TextInput::make('price')
                 ->label(__('unas::common.price'))
                 ->numeric(),
+            Forms\Components\TextInput::make('stock')
+                ->label(__('unas::common.stock'))
+                ->numeric(),
             Forms\Components\Select::make('product_unit_id')
                 ->label(__('unas::common.product_unit'))
                 ->options($productUnitRepository->getOptions())
@@ -85,7 +88,7 @@ class UnasProductResource extends Resource
                     ->label(__('unas::common.sku'))
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('translation.name')
                     ->label(__('unas::common.name'))
                     ->searchable()
                     ->sortable(),

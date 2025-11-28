@@ -58,7 +58,7 @@ class UnasDownloadProducts extends Command
             $this->info("Downloading products for UNAS shop: {$shop->name}");
 
             $unasProductApiService->eachProducts($shop, function ($unasProductId, $productDto) use ($shop, $unasProductDtoService) {
-                $unasProductDtoService->saveDto($shop, $productDto, $unasProductId);
+                $unasProductDtoService->saveDto($shop, $productDto);
                 $this->info("Downloaded product: {$productDto->sku}");
             });
         }

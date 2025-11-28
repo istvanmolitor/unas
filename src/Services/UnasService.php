@@ -7,6 +7,7 @@ use Molitor\Unas\Services\Endpoints\GetCategoryEndpoint;
 use Molitor\Unas\Services\Endpoints\GetOrderEndpoint;
 use Molitor\Unas\Services\Endpoints\GetProductEndpoint;
 use Molitor\Unas\Services\Endpoints\GetProductParameterEndpoint;
+use Molitor\Unas\Services\Endpoints\GetStockEndpoint;
 use Molitor\Unas\Services\Endpoints\SetCategoryEndpoint;
 use Molitor\Unas\Services\Endpoints\SetProductEndpoint;
 use Molitor\Unas\Services\Endpoints\SetProductParameterEndpoint;
@@ -61,6 +62,11 @@ class UnasService
     public function makeGetOrderEndpoint(string $apiKey): GetOrderEndpoint
     {
         return new GetOrderEndpoint($this->getAuth($apiKey));
+    }
+
+    public function makeGetStockEndpoint(string $apiKey): GetStockEndpoint
+    {
+        return new GetStockEndpoint($this->getAuth($apiKey));
     }
 
     public function getBooleanString(bool $value): string

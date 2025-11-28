@@ -23,7 +23,7 @@ class SyncUnasProductAction
                 Notification::make()
                     ->title(__('unas::common.sync_product'))
                     ->body(__('unas::product.sync_successfully', ['sku' => $record->sku]))
-                    ->warning()
+                    ->success()
                     ->send();
             });
     }

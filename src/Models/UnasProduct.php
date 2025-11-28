@@ -22,6 +22,7 @@ class UnasProduct extends TranslatableModel
         'sku',
         'product_unit_id',
         'price',
+        'stock',
         'remote_id',
         'changed',
     ];

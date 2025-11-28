@@ -61,6 +61,7 @@ class UnasProductDtoService
         $unasProduct->setAttributeDto('description', $productDto->description);
         $unasProduct->product_unit_id = $this->productUnitDtoService->saveDto($productDto->productUnit)->id;
         $unasProduct->price = $productDto->price;
+        $unasProduct->stock = $productDto->stock;
         $unasProduct->changed = false;
     }
 }

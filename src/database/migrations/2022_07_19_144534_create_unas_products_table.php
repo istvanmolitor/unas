@@ -28,6 +28,8 @@ class CreateUnasProductsTable extends Migration
 
             $table->decimal('price', 11)->nullable();
 
+            $table->bigInteger('stock')->nullable();
+
             $table->unsignedBigInteger('remote_id')->nullable();
             $table->boolean('changed')->default(false);
             $table->softDeletes();

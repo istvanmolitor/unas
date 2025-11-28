@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Services\Endpoints;
 
-class GetProductEndpoint extends Endpoint
-{
+use Molitor\Unas\Services\UnasService;
 
+class GetStockEndpoint extends Endpoint
+{
     protected function getEndpoint(): string
     {
-        return 'shop/getProduct';
+        return 'shop/getStock';
+    }
+
+    protected function getRootTag(): string
+    {
+        return 'Product';
     }
 
     public function setIdRequestData(int $id): void
@@ -28,11 +34,6 @@ class GetProductEndpoint extends Endpoint
         ]);
     }
 
-    protected function getRootTag(): string
-    {
-        return 'Product';
-    }
-
     public function getResultProducts(): array
     {
         if (isset($this->result['Product'])) {
@@ -43,5 +44,14 @@ class GetProductEndpoint extends Endpoint
             }
         }
         return [];
+    }
+
+    public function getResultStock(): int
+    {
+        $products = $this->getResultProducts();
+        if(count($products)) {
+            return (int)$products[0]['Stocks']['Stock']['Qty'];
+        }
+        return 0;
     }
 }

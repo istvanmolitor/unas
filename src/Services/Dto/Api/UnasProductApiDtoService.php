@@ -80,6 +80,7 @@ class UnasProductApiDtoService extends UnasService
         $productDto->weight = $result['Weight'] ?? null;
         $productDto->productUnit->name->set($defaultLanguage, $result['Unit'] ?? null);
         $productDto->price = $this->getPriceByProduct($result);
+        $productDto->stock = $result['Stocks']['Stock']['Qty'] ?? null;
 
         foreach($this->getResultImagesByProduct($result) as $image)
         {
