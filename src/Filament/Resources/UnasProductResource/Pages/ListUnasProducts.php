@@ -33,7 +33,7 @@ class ListUnasProducts extends ListRecords
 
     public function getBreadcrumb(): string
     {
-        return 'Lista';
+        return __('unas::product.list');
     }
 
     public function getTitle(): string
@@ -42,22 +42,22 @@ class ListUnasProducts extends ListRecords
             /** @var UnasShopRepositoryInterface $unasShopRepository */
             $unasShopRepository = app(UnasShopRepositoryInterface::class);
             $shop = $unasShopRepository->getById($this->unasShopId);
-            return "Termékek – {$shop->name}";
+            return __('unas::product.products_shop', ['shop' => $shop->name]);
         }
-        return 'UNAS termékek';
+        return __('unas::product.unas_products');
     }
 
     protected function getHeaderActions(): array
     {
         return [
             \Filament\Actions\Action::make('copy_all_products')
-                ->label('Összes termék átmásolása')
+                ->label(__('unas::product.copy_all_products'))
                 ->icon('heroicon-o-document-duplicate')
                 ->color('success')
                 ->requiresConfirmation()
-                ->modalHeading('Összes termék átmásolása')
-                ->modalDescription('Biztosan át szeretnéd másolni az összes terméket a termék törzsbe?')
-                ->modalSubmitActionLabel('Átmásolás')
+                ->modalHeading(__('unas::product.copy_all_products_heading'))
+                ->modalDescription(__('unas::product.copy_all_products_description'))
+                ->modalSubmitActionLabel(__('unas::product.copy_action'))
                 ->action(function () {
                     /** @var UnasProductService $service */
                     $service = app(UnasProductService::class);
@@ -71,7 +71,7 @@ class ListUnasProducts extends ListRecords
                         ->send();
                 })
                 ->visible(fn () => $this->unasShopId !== null),
-            CreateAction::make()->label('Új UNAS termék')->url(fn () => UnasProductResource::getUrl(
+            CreateAction::make()->label(__('unas::product.new_unas_product'))->url(fn () => UnasProductResource::getUrl(
                 'create',
                 ['shop_id' => $this->unasShopId]
             ))->icon('heroicon-o-plus'),

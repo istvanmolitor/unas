@@ -17,19 +17,19 @@ class ViewUnasShop extends ViewRecord
 
     public function getTitle(): string
     {
-        return 'UNAS bolt megtekintése';
+        return __('unas::common.view_unas_shop');
     }
 
     public function getBreadcrumb(): string
     {
-        return 'Megtekintés';
+        return __('unas::common.view_action');
     }
 
     protected function getHeaderActions(): array
     {
         return [
             EditAction::make()
-                ->label('Szerkesztés'),
+                ->label(__('unas::common.edit')),
         ];
     }
 
@@ -37,46 +37,46 @@ class ViewUnasShop extends ViewRecord
     {
         return $schema
             ->components([
-                Fieldset::make('Alapadatok')
+                Fieldset::make(__('unas::common.basic_data'))
                     ->schema([
                         IconEntry::make('enabled')
-                            ->label('Engedélyezve')
+                            ->label(__('unas::common.enabled'))
                             ->boolean(),
                         TextEntry::make('name')
-                            ->label('Név'),
+                            ->label(__('unas::common.name')),
                         TextEntry::make('domain')
-                            ->label('Domain')
+                            ->label(__('unas::common.domain'))
                             ->copyable(),
                         TextEntry::make('api_key')
-                            ->label('API kulcs')
+                            ->label(__('unas::common.api_key'))
                             ->copyable()
                             ->columnSpanFull(),
                         TextEntry::make('warehouse.name')
                             ->label(__('unas::common.warehouse')),
                     ])
                     ->columns(2),
-                Fieldset::make('Statisztikák')
+                Fieldset::make(__('unas::common.statistics'))
                     ->schema([
                         TextEntry::make('shopProductCategories_count')
-                            ->label('Termékkategóriák száma')
+                            ->label(__('unas::common.product_categories_count'))
                             ->state(fn ($record) => $record->shopProductCategories()->count()),
                         TextEntry::make('shopProducts_count')
-                            ->label('Termékek száma')
+                            ->label(__('unas::common.products_count'))
                             ->state(fn ($record) => $record->shopProducts()->count())
                             ->url(fn ($record) => UnasProductResource::getUrl('index', ['shop_id' => $record->getKey()]))
                             ->color('primary'),
                         TextEntry::make('shopProductParameters_count')
-                            ->label('Termék paraméterek száma')
+                            ->label(__('unas::common.product_parameters_count'))
                             ->state(fn ($record) => $record->shopProductParameters()->count()),
                     ])
                     ->columns(3),
-                Fieldset::make('Időbélyegek')
+                Fieldset::make(__('unas::common.timestamps'))
                     ->schema([
                         TextEntry::make('created_at')
-                            ->label('Létrehozva')
+                            ->label(__('unas::common.created'))
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label('Frissítve')
+                            ->label(__('unas::common.updated'))
                             ->dateTime(),
                     ])
                     ->columns(2),

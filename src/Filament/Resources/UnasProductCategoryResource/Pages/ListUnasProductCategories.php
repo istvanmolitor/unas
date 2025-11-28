@@ -17,19 +17,19 @@ class ListUnasProductCategories extends ListRecords
 
     public function getBreadcrumb(): string
     {
-        return 'Lista';
+        return __('unas::common.list');
     }
 
     public function getTitle(): string
     {
-        return 'UNAS kategóriák';
+        return __('unas::common.unas_categories');
     }
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make()
-                ->label('Új kategória')
+                ->label(__('unas::common.new_category'))
                 ->icon('heroicon-o-plus'),
         ];
     }

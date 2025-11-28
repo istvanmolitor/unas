@@ -24,12 +24,12 @@ class UnasProductCategoryResource extends Resource
 
     public static function getNavigationGroup(): string
     {
-        return 'UNAS';
+        return __('unas::common.unas');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'UNAS kategóriák';
+        return __('unas::common.unas_categories');
     }
 
     public static function canAccess(): bool
@@ -43,7 +43,7 @@ class UnasProductCategoryResource extends Resource
             Grid::make(2)->schema([
                 Forms\Components\Select::make('unas_shop_id')
                     ->relationship('shop', 'name')
-                    ->label('Bolt')
+                    ->label(__('unas::common.shop'))
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -51,28 +51,28 @@ class UnasProductCategoryResource extends Resource
                     ->numeric()
                     ->default(0)
                     ->minValue(0)
-                    ->label('Szülő kategória ID (0 = Főkategória)'),
+                    ->label(__('unas::common.parent_id')),
             ]),
             Forms\Components\TextInput::make('name')
-                ->label('Név')
+                ->label(__('unas::common.name'))
                 ->required()
                 ->maxLength(255),
             Grid::make(2)->schema([
                 Forms\Components\Toggle::make('display_page')
-                    ->label('Megjelenítés oldalon')
+                    ->label(__('unas::common.display_page'))
                     ->default(true),
                 Forms\Components\Toggle::make('display_menu')
-                    ->label('Megjelenítés menüben')
+                    ->label(__('unas::common.display_menu'))
                     ->default(true),
             ]),
             Forms\Components\TextInput::make('title')
-                ->label('Cím')
+                ->label(__('unas::common.title'))
                 ->maxLength(255),
             Forms\Components\TextInput::make('keywords')
-                ->label('Kulcsszavak')
+                ->label(__('unas::common.keywords'))
                 ->maxLength(255),
             Forms\Components\Textarea::make('description')
-                ->label('Leírás')
+                ->label(__('unas::common.description'))
                 ->rows(3)
                 ->columnSpanFull(),
         ])->columns(1);
@@ -83,18 +83,18 @@ class UnasProductCategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('shop.name')
-                    ->label('Bolt')
+                    ->label(__('unas::common.shop'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Név')
+                    ->label(__('unas::common.name'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('display_page')
                     ->boolean()
-                    ->label('Oldalon'),
+                    ->label(__('unas::common.on_page')),
                 Tables\Columns\IconColumn::make('display_menu')
                     ->boolean()
-                    ->label('Menüben'),
+                    ->label(__('unas::common.in_menu')),
             ])
             ->filters([
             ])

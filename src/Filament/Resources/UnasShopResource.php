@@ -23,12 +23,12 @@ class UnasShopResource extends Resource
 
     public static function getNavigationGroup(): string
     {
-        return 'UNAS';
+        return __('unas::common.unas');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'UNAS boltok';
+        return __('unas::common.unas_shops');
     }
 
     public static function canAccess(): bool
@@ -40,18 +40,18 @@ class UnasShopResource extends Resource
     {
         return $schema->components([
             Forms\Components\Toggle::make('enabled')
-                ->label('Engedélyezve')
+                ->label(__('unas::common.enabled'))
                 ->default(true),
             Forms\Components\TextInput::make('name')
-                ->label('Név')
+                ->label(__('unas::common.name'))
                 ->required()
                 ->maxLength(255),
             Forms\Components\TextInput::make('domain')
-                ->label('Domain')
+                ->label(__('unas::common.domain'))
                 ->required()
                 ->maxLength(255),
             Forms\Components\TextInput::make('api_key')
-                ->label('API kulcs')
+                ->label(__('unas::common.api_key'))
                 ->required()
                 ->maxLength(255),
             Forms\Components\Select::make('warehouse_id')
@@ -69,13 +69,13 @@ class UnasShopResource extends Resource
             ->columns([
                 Tables\Columns\IconColumn::make('enabled')
                     ->boolean()
-                    ->label('Aktív'),
+                    ->label(__('unas::common.active')),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Név')
+                    ->label(__('unas::common.name'))
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('domain')
-                    ->label('Domain')
+                    ->label(__('unas::common.domain'))
                     ->sortable()
                     ->searchable(),
             ])

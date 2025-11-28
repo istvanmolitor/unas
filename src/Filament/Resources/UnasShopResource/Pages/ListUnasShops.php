@@ -20,19 +20,19 @@ class ListUnasShops extends ListRecords
 
     public function getBreadcrumb(): string
     {
-        return 'Lista';
+        return __('unas::common.list');
     }
 
     public function getTitle(): string
     {
-        return 'UNAS boltok';
+        return __('unas::common.unas_shops');
     }
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make()
-                ->label('Új UNAS bolt')
+                ->label(__('unas::common.new_unas_shop'))
                 ->icon('heroicon-o-plus'),
         ];
     }
@@ -42,7 +42,7 @@ class ListUnasShops extends ListRecords
         return UnasShopResource::table($table)
             ->actions([
                 Action::make('products')
-                    ->label('Termékek')
+                    ->label(__('unas::common.products'))
                     ->icon('heroicon-o-cube')
                     ->url(function ($record) {
                         return 'unas-products?shop_id=' . $record->getKey();

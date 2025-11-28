@@ -11,7 +11,7 @@ class UnasProductActions
         return ActionGroup::make([
             SyncUnasProductAction::make(),
             CopyUnasProductToProductAction::make(),
-        ])->label('Műveletek')
+        ])->label(__('unas::common.actions'))
         ->icon('heroicon-m-ellipsis-vertical')
         ->size('md')
         ->color('gray')

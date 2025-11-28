@@ -11,11 +11,11 @@ class EditUnasProductCategory extends EditRecord
 
     public function getTitle(): string
     {
-        return 'Kategória szerkesztése';
+        return __('unas::common.edit_category');
     }
 
     public function getBreadcrumb(): string
     {
-        return 'Szerkesztés';
+        return __('unas::common.edit');
     }
 }
