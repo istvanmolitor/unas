@@ -49,7 +49,7 @@ class UnasOrderService extends UnasService
         ]);
     }
 
-    public function downloadOrders(UnasShop $shop)
+    public function downloadOrders(UnasShop $shop): void
     {
         $endpoint = $this->makeGetOrderEndpoint($shop->api_key);
         $endpoint->execute();
