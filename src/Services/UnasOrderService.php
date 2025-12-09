@@ -31,9 +31,9 @@ class UnasOrderService extends UnasService
             return $unasOrder;
         }
 
-        $mail = $resultOrder['Email'];
-
-        $customer = $this->customerRepository->findOrCrate('aaaa');
+        $mail = $resultOrder['Customer']['Email'] ?? null;
+        $internalName = $mail ?? ('unas-' . $remoteId);
+        $customer = $this->customerRepository->findOrCrate($internalName);
 
         $order = $this->orderRepository->create(
             (string)$resultOrder['Key'],
@@ -42,10 +42,11 @@ class UnasOrderService extends UnasService
             $this->orderStatusRepository->fundOrCreate($resultOrder['Status'])
         );
 
-        return $this->unasOrder->create([
+        return UnasOrder::create([
             'unas_shop_id' => $shop->id,
             'order_id' => $order->id,
             'remote_id' => $remoteId,
+            'changed' => $resultOrder['Changed'] ?? null,
         ]);
     }
 
