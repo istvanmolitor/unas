@@ -2,29 +2,19 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
-use Molitor\Customer\Repositories\CustomerRepositoryInterface;
-use Molitor\Order\Repositories\OrderRepository;
-use Molitor\Order\Repositories\OrderStatusRepository;
-use Molitor\Unas\Services\UnasService;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasOrder;
 
 class UnasOrderRepository implements UnasOrderRepositoryInterface
 {
     private UnasOrder $unasOrder;
-    private OrderStatusRepository $orderStatusRepository;
 
-    public function __construct(
-        private CurrencyRepositoryInterface $currencyRepository,
-        private CustomerRepositoryInterface $customerRepository
-    )
+    public function __construct()
     {
         $this->unasOrder = new UnasOrder();
-        $this->orderStatusRepository = new OrderStatusRepository();
     }
 
-    public function getByRemoteId(int $remoteId): ?UnasOrder
+    public function getByRemoteId(int $remoteId): UnasOrder|null
     {
         return $this->unasOrder->where('remote_id', $remoteId)->first();
     }

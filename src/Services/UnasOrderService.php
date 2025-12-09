@@ -2,19 +2,36 @@
 
 namespace Molitor\Unas\Services;
 
+use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
+use Molitor\Customer\Repositories\CustomerRepositoryInterface;
+use Molitor\Order\Repositories\OrderRepositoryInterface;
+use Molitor\Order\Repositories\OrderStatusRepositoryInterface;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasOrder;
+use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
 
 class UnasOrderService extends UnasService
 {
+    public function __construct(
+        private CustomerRepositoryInterface $customerRepository,
+        private UnasOrderRepositoryInterface $unasOrderRepository,
+        private OrderRepositoryInterface $orderRepository,
+        private CurrencyRepositoryInterface $currencyRepository,
+        private OrderStatusRepositoryInterface $orderStatusRepository,
+    )
+    {
+    }
+
     public function storeResultOrder(UnasShop $shop, array $resultOrder): UnasOrder
     {
         $remoteId = (int)$resultOrder['Id'];
 
-        $unasOrder = $this->getByRemoteId($remoteId);
+        $unasOrder = $this->unasOrderRepository->getByRemoteId($remoteId);
         if ($unasOrder) {
             return $unasOrder;
         }
+
+        $mail = $resultOrder['Email'];
 
         $customer = $this->customerRepository->findOrCrate('aaaa');
 
@@ -34,7 +51,7 @@ class UnasOrderService extends UnasService
 
     public function downloadOrders(UnasShop $shop)
     {
-        $endpoint = (new UnasService($shop->api_key))->makeGetOrderEndpoint();
+        $endpoint = $this->makeGetOrderEndpoint($shop->api_key);
         $endpoint->execute();
 
         foreach ($endpoint->getResultOrders() as $resultOrder) {

@@ -7,7 +7,7 @@ use Molitor\Unas\Models\UnasOrder;
 
 interface UnasOrderRepositoryInterface
 {
-    public function getByRemoteId(int $remoteId): ?UnasOrder;
+    public function getByRemoteId(int $remoteId): UnasOrder|null;
 
     public function deleteByShop(UnasShop $shop): void;
 
