@@ -59,4 +59,18 @@ class UnasOrderService extends UnasService
             $this->storeResultOrder($shop, $resultOrder);
         }
     }
+
+    public function downloadOrderByCode(UnasShop $shop, string $code): UnasOrder|null
+    {
+        $endpoint = $this->makeGetOrderEndpoint($shop->api_key);
+        $endpoint->setKeyRequestData($code);
+        $endpoint->execute();
+
+        $stored = null;
+        foreach ($endpoint->getResultOrders() as $resultOrder) {
+            $stored = $this->storeResultOrder($shop, $resultOrder);
+        }
+
+        return $stored;
+    }
 }
