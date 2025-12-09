@@ -32,6 +32,8 @@ class UnasDownloadOrders extends Command
      */
     public function handle(): int
     {
+        dd('ddd');
+
         /** @var UnasShopRepositoryInterface $unasShopRepository */
         $unasShopRepository = app(UnasShopRepositoryInterface::class);
 

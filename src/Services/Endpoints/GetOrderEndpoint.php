@@ -47,6 +47,11 @@ class GetOrderEndpoint extends Endpoint
         return [];
     }
 
+    public function getResultOrder(): array
+    {
+        return $this->getResultOrders()[0] ?? [];
+    }
+
     public function getCustomerByOrderResult(array $orderResult): array
     {
         return [
