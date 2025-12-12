@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Gate;
 use Molitor\Language\Filament\Components\TranslatableFields;
 use Molitor\Product\Repositories\ProductUnitRepositoryInterface;
 use Molitor\Unas\Filament\Resources\UnasProductResource\Pages;
+use Molitor\Unas\Filament\Resources\UnasProductResource\RelationManagers\UnasProductImagesRelationManager;
 use Molitor\Unas\Models\UnasProduct;
 
 class UnasProductResource extends Resource
@@ -125,6 +126,13 @@ class UnasProductResource extends Resource
             'create' => Pages\CreateUnasProduct::route('/create'),
             'view' => Pages\ViewUnasProduct::route('/{record}'),
             'edit' => Pages\EditUnasProduct::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            UnasProductImagesRelationManager::class,
         ];
     }
 }

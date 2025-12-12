@@ -5,6 +5,7 @@ namespace Molitor\Unas\Services\Dto;
 use Molitor\Product\Dto\ProductDto;
 use Molitor\Product\Services\Dto\ProductUnitDtoService;
 use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Models\UnasProductImage;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 
@@ -39,6 +40,9 @@ class UnasProductDtoService
         }
         $this->fillModel($unasProduct, $productDto);
         $unasProduct->save();
+
+        // Sync images after product has an ID
+        $this->syncImages($unasProduct, $productDto);
         return $unasProduct;
     }
 
@@ -63,5 +67,57 @@ class UnasProductDtoService
         $unasProduct->price = $productDto->price;
         $unasProduct->stock = $productDto->stock;
         $unasProduct->changed = false;
+    }
+
+    protected function syncImages(UnasProduct $unasProduct, ProductDto $productDto): void
+    {
+        // Collect DTO image URLs preserving order
+        $dtoImages = $productDto->getImages();
+        $dtoUrls = [];
+
+        // Index existing images by URL for quick lookup
+        $existing = $unasProduct->images()->get()->keyBy('url');
+
+        foreach ($dtoImages as $sort => $imageDto) {
+            $url = trim($imageDto->url ?? '');
+            if ($url === '') {
+                continue;
+            }
+            $dtoUrls[] = $url;
+
+            $alt = '';
+            // Prefer Hungarian alt if available, otherwise first available translation
+            if (method_exists($imageDto->alt, 'has') && $imageDto->alt->has('hu')) {
+                $alt = $imageDto->alt->get('hu');
+            } elseif (method_exists($imageDto->alt, 'getTranslations')) {
+                $translations = $imageDto->alt->getTranslations();
+                if (!empty($translations)) {
+                    $alt = reset($translations) ?: '';
+                }
+            }
+
+            /** @var UnasProductImage|null $existingImage */
+            $existingImage = $existing->get($url);
+            if ($existingImage) {
+                // Update sort and alt if changed
+                $existingImage->sort = $sort;
+                $existingImage->alt = $alt ?: $existingImage->alt;
+                $existingImage->save();
+            } else {
+                $unasProduct->images()->create([
+                    'url' => $url,
+                    'sort' => $sort,
+                    'alt' => $alt,
+                ]);
+            }
+        }
+
+        // Remove images that are no longer present in DTO
+        if (count($dtoUrls)) {
+            $unasProduct->images()->whereNotIn('url', $dtoUrls)->delete();
+        } else {
+            // If no images provided, clear all
+            $unasProduct->images()->delete();
+        }
     }
 }

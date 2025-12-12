@@ -7,6 +7,8 @@ use Molitor\Customer\Repositories\CustomerRepositoryInterface;
 use Molitor\Order\Models\Order;
 use Molitor\Order\Repositories\OrderRepositoryInterface;
 use Molitor\Order\Repositories\OrderStatusRepositoryInterface;
+use Molitor\Order\Repositories\OrderPaymentRepositoryInterface;
+use Molitor\Order\Repositories\OrderShippingRepositoryInterface;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasOrder;
 use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
@@ -23,7 +25,9 @@ class UnasOrderService extends UnasService
         private OrderRepositoryInterface $orderRepository,
         private CurrencyRepositoryInterface $currencyRepository,
         private OrderStatusRepositoryInterface $orderStatusRepository,
-        private ProductRepositoryInterface $productRepository
+        private ProductRepositoryInterface $productRepository,
+        private OrderPaymentRepositoryInterface $orderPaymentRepository,
+        private OrderShippingRepositoryInterface $orderShippingRepository
     )
     {
     }
@@ -87,7 +91,7 @@ class UnasOrderService extends UnasService
 
         $this->saveOrderItems($order, $resultOrder['Items']['Item'] ?? []);
 
-        // Compose comments with UNAS metadata
+        // Compose comments with UNAS metadata and map fields moved to dedicated columns
         $contact = $resultOrder['Customer']['Contact'] ?? [];
         $payment = $resultOrder['Payment'] ?? [];
         $shippingInfo = $resultOrder['Shipping'] ?? [];
@@ -107,6 +111,23 @@ class UnasOrderService extends UnasService
 
         $order->comment = implode("\n", $metaLines);
         $order->internal_comment = 'UNAS Status: ' . ($resultOrder['Status'] ?? '') . ' / ' . ($resultOrder['StatusType'] ?? '') . ' (Seen: ' . ($resultOrder['Seen'] ?? '') . ', Auth: ' . ($resultOrder['Authenticated'] ?? '') . ')';
+
+        $order->phone = $contact['Phone'] ?? null;
+        $order->referer = $resultOrder['Referer'] ?? null;
+        $order->invoice = $invoiceInfo['Number'] ?? ($invoiceInfo['Url'] ?? null);
+
+        if (!empty($payment['Name'])) {
+            $paymentModel = $this->orderPaymentRepository->getByName((string)$payment['Name']);
+            if ($paymentModel) {
+                $order->order_payment_id = $paymentModel->id;
+            }
+        }
+        if (!empty($shippingInfo['Name'])) {
+            $shippingModel = $this->orderShippingRepository->getByName((string)$shippingInfo['Name']);
+            if ($shippingModel) {
+                $order->order_shipping_id = $shippingModel->id;
+            }
+        }
         $order->save();
 
         return UnasOrder::create([

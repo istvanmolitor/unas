@@ -6,6 +6,7 @@ namespace Molitor\Unas\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Molitor\Language\Models\TranslatableModel;
 use Molitor\Product\Models\Product;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -55,5 +56,10 @@ class UnasProduct extends TranslatableModel
     public function productUnit(): BelongsTo
     {
         return $this->belongsTo(ProductUnit::class, 'product_unit_id');
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(UnasProductImage::class, 'unas_product_id')->orderBy('sort');
     }
 }

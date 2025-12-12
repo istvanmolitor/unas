@@ -15,6 +15,17 @@ class UnasProductImage extends Model
         'alt',
     ];
 
+    protected static function booted(): void
+    {
+        static::creating(function (UnasProductImage $image) {
+            // If sort is not provided, assign the next index within the same product
+            if ($image->sort === null && $image->unas_product_id) {
+                $max = self::where('unas_product_id', $image->unas_product_id)->max('sort');
+                $image->sort = ($max === null) ? 0 : ($max + 1);
+            }
+        });
+    }
+
     public function shopProducts()
     {
         return $this->hasMany(UnasProduct::class, 'unas_shop_id');

@@ -17,7 +17,7 @@ class UnasProductImageRepository implements UnasProductImageRepositoryInterface
 
     public function getByProduct(UnasProduct $product): Collection
     {
-        return $this->productImage->where('unas_product_id', $product->id)->orderBy('short')->get();
+        return $this->productImage->where('unas_product_id', $product->id)->orderBy('sort')->get();
     }
 
     private function getNextShort(UnasProduct $product): int

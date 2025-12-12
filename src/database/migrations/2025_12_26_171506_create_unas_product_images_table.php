@@ -20,7 +20,7 @@ class CreateUnasProductImagesTable extends Migration
             $table->foreign('unas_product_id')->references('id')->on('unas_products');
 
             $table->string('url')->nullable();
-            $table->integer('sort');
+            $table->integer('sort')->default(0);
 
             $table->string('alt')->nullable();
 
