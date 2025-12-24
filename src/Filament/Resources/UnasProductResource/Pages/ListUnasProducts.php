@@ -50,6 +50,27 @@ class ListUnasProducts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            \Filament\Actions\Action::make('download_products')
+                ->label(__('unas::product.download_products'))
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary')
+                ->requiresConfirmation()
+                ->modalHeading(__('unas::product.download_products_heading'))
+                ->modalDescription(__('unas::product.download_products_description'))
+                ->modalSubmitActionLabel(__('unas::product.download_action'))
+                ->action(function () {
+                    /** @var UnasProductService $service */
+                    $service = app(UnasProductService::class);
+
+                    $shop = UnasShop::findOrFail($this->unasShopId);
+                    $service->dispatchDownloadProducts($shop);
+
+                    Notification::make()
+                        ->title(__('unas::product.download_job_dispatched'))
+                        ->success()
+                        ->send();
+                })
+                ->visible(fn () => $this->unasShopId !== null),
             \Filament\Actions\Action::make('copy_all_products')
                 ->label(__('unas::product.copy_all_products'))
                 ->icon('heroicon-o-document-duplicate')

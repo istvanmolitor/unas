@@ -48,19 +48,12 @@ class UnasDownloadProducts extends Command
         /** @var UnasShopRepository $unasShopRepository */
         $unasShopRepository = app(UnasShopRepositoryInterface::class);
 
-        /** @var UnasProductApiDtoService $unasProductApiService */
-        $unasProductApiService = app(UnasProductApiDtoService::class);
-
-        /** @var UnasProductDtoService $unasProductDtoService */
-        $unasProductDtoService = app(UnasProductDtoService::class);
+        /** @var UnasProductService $unasProductService */
+        $unasProductService = app(UnasProductService::class);
 
         foreach ($unasShopRepository->getEnableShops() as $shop) {
             $this->info("Downloading products for UNAS shop: {$shop->name}");
-
-            $unasProductApiService->eachProducts($shop, function ($unasProductId, $productDto) use ($shop, $unasProductDtoService) {
-                $unasProductDtoService->saveDto($shop, $productDto);
-                $this->info("Downloaded product: {$productDto->sku}");
-            });
+            $unasProductService->downloadProducts($shop);
         }
         return 0;
     }

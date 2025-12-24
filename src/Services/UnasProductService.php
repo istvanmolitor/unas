@@ -6,6 +6,7 @@ use Molitor\Product\Dto\ProductDto;
 use Molitor\Product\Models\Product;
 use Molitor\Product\Repositories\ProductUnitRepositoryInterface;
 use Molitor\Product\Services\Dto\ProductDtoService;
+use Molitor\Unas\Jobs\DownloadUnasProductsJob;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasShop;
@@ -331,5 +332,17 @@ class UnasProductService extends UnasService
             }
         }
         return $i;
+    }
+
+    public function downloadProducts(UnasShop $shop): void
+    {
+        $this->unasProductApiDtoService->eachProducts($shop, function ($unasProductId, $productDto) use ($shop) {
+            $this->unasProductDtoService->saveDto($shop, $productDto);
+        });
+    }
+
+    public function dispatchDownloadProducts(UnasShop $shop): void
+    {
+        DownloadUnasProductsJob::dispatch($shop);
     }
 }

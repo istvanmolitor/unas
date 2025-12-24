@@ -3,6 +3,7 @@
 namespace Molitor\Unas\Services\Dto;
 
 use Molitor\Product\Dto\ProductDto;
+use Molitor\Product\Services\ProductImageService;
 use Molitor\Product\Services\Dto\ProductUnitDtoService;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductImage;
@@ -118,6 +119,20 @@ class UnasProductDtoService
         } else {
             // If no images provided, clear all
             $unasProduct->images()->delete();
+        }
+
+        // Queue product image downloads to main Product, preserving order
+        $product = $unasProduct->product;
+        if ($product) {
+            /** @var ProductImageService $productImageService */
+            $productImageService = app(ProductImageService::class);
+            foreach ($dtoImages as $sort => $imageDto) {
+                $url = trim($imageDto->url ?? '');
+                if ($url === '') {
+                    continue;
+                }
+                $productImageService->queueDownload($product, $url, $sort === 0);
+            }
         }
     }
 }
