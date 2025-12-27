@@ -72,67 +72,28 @@ class UnasProductDtoService
 
     protected function syncImages(UnasProduct $unasProduct, ProductDto $productDto): void
     {
-        // Collect DTO image URLs preserving order
         $dtoImages = $productDto->getImages();
-        $dtoUrls = [];
 
-        // Index existing images by URL for quick lookup
-        $existing = $unasProduct->images()->get()->keyBy('url');
+        $existingImages = $unasProduct->images()->get();
+        $existingUrls = $existingImages->pluck('url')->toArray();
+        $dtoUrls = array_map(fn($image) => $image->url, $dtoImages);
 
-        foreach ($dtoImages as $sort => $imageDto) {
-            $url = trim($imageDto->url ?? '');
-            if ($url === '') {
-                continue;
-            }
-            $dtoUrls[] = $url;
-
-            $alt = '';
-            // Prefer Hungarian alt if available, otherwise first available translation
-            if (method_exists($imageDto->alt, 'has') && $imageDto->alt->has('hu')) {
-                $alt = $imageDto->alt->get('hu');
-            } elseif (method_exists($imageDto->alt, 'getTranslations')) {
-                $translations = $imageDto->alt->getTranslations();
-                if (!empty($translations)) {
-                    $alt = reset($translations) ?: '';
-                }
-            }
-
-            /** @var UnasProductImage|null $existingImage */
-            $existingImage = $existing->get($url);
-            if ($existingImage) {
-                // Update sort and alt if changed
-                $existingImage->sort = $sort;
-                $existingImage->alt = $alt ?: $existingImage->alt;
-                $existingImage->save();
-            } else {
-                $unasProduct->images()->create([
-                    'url' => $url,
-                    'sort' => $sort,
-                    'alt' => $alt,
-                ]);
-            }
+        $urlsToDelete = array_diff($existingUrls, $dtoUrls);
+        if (!empty($urlsToDelete)) {
+            $unasProduct->images()->whereIn('url', $urlsToDelete)->delete();
         }
 
-        // Remove images that are no longer present in DTO
-        if (count($dtoUrls)) {
-            $unasProduct->images()->whereNotIn('url', $dtoUrls)->delete();
-        } else {
-            // If no images provided, clear all
-            $unasProduct->images()->delete();
-        }
-
-        // Queue product image downloads to main Product, preserving order
-        $product = $unasProduct->product;
-        if ($product) {
-            /** @var ProductImageService $productImageService */
-            $productImageService = app(ProductImageService::class);
-            foreach ($dtoImages as $sort => $imageDto) {
-                $url = trim($imageDto->url ?? '');
-                if ($url === '') {
-                    continue;
-                }
-                $productImageService->queueDownload($product, $url, $sort === 0);
+        foreach ($dtoImages as $index => $imageDto) {
+            $unasProductImage = $existingImages->firstWhere('url', $imageDto->url);
+            if(!$unasProductImage) {
+                $unasProductImage = new UnasProductImage();
+                $unasProductImage->unas_product_id = $unasProduct->id;
+                $unasProductImage->url = $imageDto->url;
             }
+
+            $unasProductImage->sort = $index;
+            $unasProductImage->alt = $imageDto->getAttributeDto('alt');
+            $unasProductImage->save();
         }
     }
 }
