@@ -68,4 +68,7 @@ return [
     'actions' => 'Műveletek',
     'unas_shops' => 'UNAS boltok',
     'new_unas_shop' => 'Új UNAS bolt',
+    'product_images' => 'Képek',
+    'image_data' => 'Kép adatok',
+    'image' => 'Kép',
 ];

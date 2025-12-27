@@ -68,5 +68,8 @@ return [
     'actions' => 'Actions',
     'unas_shops' => 'UNAS Shops',
     'new_unas_shop' => 'New UNAS Shop',
+    'product_images' => 'Images',
+    'image_data' => 'Image Data',
+    'image' => 'Image',
 ];
 

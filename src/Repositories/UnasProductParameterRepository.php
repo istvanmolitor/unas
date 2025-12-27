@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Services\Endpoint;
-use Molitor\Unas\Services\UnasService;
 use Molitor\Product\Models\ProductField;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProductParameter;

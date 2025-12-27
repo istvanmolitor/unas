@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Molitor\Language\Models\TranslatableModel;
 
-class UnasProductImage extends Model
+class UnasProductImage extends TranslatableModel
 {
     protected $fillable = [
         'unas_product_id',
-        'url',
+        'image_url',
+        'is_main',
         'sort',
-        'alt',
     ];
+
+    public function getTranslationModelClass(): string
+    {
+        return UnasProductImageTranslation::class;
+    }
 
     protected static function booted(): void
     {
@@ -26,13 +32,18 @@ class UnasProductImage extends Model
         });
     }
 
-    public function shopProducts()
+    public function unasProduct(): BelongsTo
     {
-        return $this->hasMany(UnasProduct::class, 'unas_shop_id');
+        return $this->belongsTo(UnasProduct::class, 'unas_product_id');
+    }
+
+    public function getSrc(): string|null
+    {
+        return $this->image_url;
     }
 
     public function __toString(): string
     {
-        return $this->alt;
+        return $this->alt ?? $this->image_url ?? '';
     }
 }

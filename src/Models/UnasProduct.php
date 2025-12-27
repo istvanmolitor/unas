@@ -62,4 +62,26 @@ class UnasProduct extends TranslatableModel
     {
         return $this->hasMany(UnasProductImage::class, 'unas_product_id')->orderBy('sort');
     }
+
+    public function unasProductImages(): HasMany
+    {
+        return $this->hasMany(UnasProductImage::class, 'unas_product_id')->orderBy('sort');
+    }
+
+    public function mainImage()
+    {
+        return $this->hasOne(UnasProductImage::class, 'unas_product_id')->where('is_main', true);
+    }
+
+    public function parameters(): BelongsToMany
+    {
+        return $this->belongsToMany(UnasProductParameter::class, 'unas_product_parameter_values', 'unas_product_id', 'unas_product_parameter_id')
+            ->withPivot('value', 'product_field_option_id')
+            ->withTimestamps();
+    }
+
+    public function attributes(): HasMany
+    {
+        return $this->hasMany(UnasProductAttribute::class, 'unas_product_id')->orderBy('sort');
+    }
 }

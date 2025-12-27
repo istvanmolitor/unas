@@ -7,6 +7,7 @@ use Molitor\Product\Services\ProductImageService;
 use Molitor\Product\Services\Dto\ProductUnitDtoService;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductImage;
+use Molitor\Unas\Models\UnasProductParameter;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 
@@ -44,6 +45,10 @@ class UnasProductDtoService
 
         // Sync images after product has an ID
         $this->syncImages($unasProduct, $productDto);
+
+        // Sync parameters after product has an ID
+        $this->syncParameters($unasProduct, $productDto);
+
         return $unasProduct;
     }
 
@@ -95,5 +100,39 @@ class UnasProductDtoService
             $unasProductImage->alt = $imageDto->getAttributeDto('alt');
             $unasProductImage->save();
         }
+    }
+
+    protected function syncParameters(UnasProduct $unasProduct, ProductDto $productDto): void
+    {
+        $dtoAttributes = $productDto->getAttributes();
+
+        if (empty($dtoAttributes)) {
+            // If no attributes in DTO, detach all
+            $unasProduct->parameters()->detach();
+            return;
+        }
+
+        $syncData = [];
+        foreach ($dtoAttributes as $index => $attributeDto) {
+            $parameter = UnasProductParameter::firstOrCreate(
+                [
+                    'unas_shop_id' => $unasProduct->unas_shop_id,
+                    'product_field_id' => $attributeDto->field->id,
+                ],
+                [
+                    'name' => $attributeDto->field->name,
+                    'type' => $attributeDto->field->type ?? 'text',
+                    'language_id' => 1, // Default language, adjust as needed
+                    'order' => $index,
+                ]
+            );
+
+            $syncData[$parameter->id] = [
+                'product_field_option_id' => $attributeDto->option->id ?? null,
+                'value' => $attributeDto->option->value ?? null,
+            ];
+        }
+
+        $unasProduct->parameters()->sync($syncData);
     }
 }

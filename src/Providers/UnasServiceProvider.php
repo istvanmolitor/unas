@@ -12,6 +12,8 @@ use Molitor\Unas\Console\Commands\UnasSync;
 use Molitor\Unas\Listeners\ProductUpdateListener;
 use Molitor\Unas\Repositories\UnasOrderRepository;
 use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
+use Molitor\Unas\Repositories\UnasProductAttributeRepository;
+use Molitor\Unas\Repositories\UnasProductAttributeRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepository;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductCategoryRepository;
@@ -52,6 +54,7 @@ class UnasServiceProvider extends EventServiceProvider
     public function register()
     {
         $this->app->bind(UnasOrderRepositoryInterface::class, UnasOrderRepository::class);
+        $this->app->bind(UnasProductAttributeRepositoryInterface::class, UnasProductAttributeRepository::class);
         $this->app->bind(UnasProductCategoryProductRepositoryInterface::class, UnasProductCategoryProductRepository::class);
         $this->app->bind(UnasProductCategoryRepositoryInterface::class, UnasProductCategoryRepository::class);
         $this->app->bind(UnasProductParameterRepositoryInterface::class, UnasProductParameterRepository::class);
