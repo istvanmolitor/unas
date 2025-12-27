@@ -8,6 +8,7 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
+use Molitor\Unas\Filament\Resources\UnasProductCategoryResource;
 use Molitor\Unas\Filament\Resources\UnasProductResource;
 use Molitor\Unas\Filament\Resources\UnasShopResource;
 
@@ -59,7 +60,9 @@ class ViewUnasShop extends ViewRecord
                     ->schema([
                         TextEntry::make('shopProductCategories_count')
                             ->label(__('unas::common.product_categories_count'))
-                            ->state(fn ($record) => $record->shopProductCategories()->count()),
+                            ->state(fn ($record) => $record->shopProductCategories()->count())
+                            ->url(fn ($record) => UnasProductCategoryResource::getUrl('index', ['shop_id' => $record->getKey()]))
+                            ->color('primary'),
                         TextEntry::make('shopProducts_count')
                             ->label(__('unas::common.products_count'))
                             ->state(fn ($record) => $record->shopProducts()->count())

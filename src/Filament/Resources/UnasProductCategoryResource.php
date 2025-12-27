@@ -22,6 +22,11 @@ class UnasProductCategoryResource extends Resource
 
     protected static \BackedEnum|null|string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function getNavigationGroup(): string
     {
         return __('unas::common.unas');
@@ -47,11 +52,13 @@ class UnasProductCategoryResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required(),
-                Forms\Components\TextInput::make('parent_id')
-                    ->numeric()
-                    ->default(0)
-                    ->minValue(0)
-                    ->label(__('unas::common.parent_id')),
+                Forms\Components\Select::make('parent_id')
+                    ->relationship('parent', 'name')
+                    ->label(__('unas::common.parent_category'))
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->default(0),
             ]),
             Forms\Components\TextInput::make('name')
                 ->label(__('unas::common.name'))
@@ -88,6 +95,10 @@ class UnasProductCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('unas::common.name'))
                     ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label(__('unas::common.parent_category'))
+                    ->default('-')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('display_page')
                     ->boolean()

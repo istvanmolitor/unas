@@ -10,10 +10,19 @@ use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Table;
 use Molitor\Unas\Filament\Resources\UnasProductCategoryResource;
+use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
 
 class ListUnasProductCategories extends ListRecords
 {
     protected static string $resource = UnasProductCategoryResource::class;
+
+    public int|null $unasShopId = null;
+
+    public function mount(): void
+    {
+        parent::mount();
+        $this->unasShopId = request()->integer('shop_id');
+    }
 
     public function getBreadcrumb(): string
     {
@@ -22,6 +31,12 @@ class ListUnasProductCategories extends ListRecords
 
     public function getTitle(): string
     {
+        if ($this->unasShopId) {
+            /** @var UnasShopRepositoryInterface $unasShopRepository */
+            $unasShopRepository = app(UnasShopRepositoryInterface::class);
+            $shop = $unasShopRepository->getById($this->unasShopId);
+            return __('unas::common.categories_shop', ['shop' => $shop->name]);
+        }
         return __('unas::common.unas_categories');
     }
 
@@ -30,13 +45,17 @@ class ListUnasProductCategories extends ListRecords
         return [
             CreateAction::make()
                 ->label(__('unas::common.new_category'))
-                ->icon('heroicon-o-plus'),
+                ->icon('heroicon-o-plus')
+                ->url(fn () => UnasProductCategoryResource::getUrl(
+                    'create',
+                    ['shop_id' => $this->unasShopId]
+                )),
         ];
     }
 
     public function table(Table $table): Table
     {
-        return UnasProductCategoryResource::table($table)
+        $table = UnasProductCategoryResource::table($table)
             ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
@@ -46,5 +65,13 @@ class ListUnasProductCategories extends ListRecords
                     DeleteBulkAction::make(),
                 ]),
             ]);
+
+        if ($this->unasShopId) {
+            $table->modifyQueryUsing(function ($query) {
+                $query->where('unas_shop_id', $this->unasShopId);
+            });
+        }
+
+        return $table;
     }
 }
