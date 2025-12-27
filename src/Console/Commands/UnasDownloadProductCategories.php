@@ -5,23 +5,23 @@ namespace Molitor\Unas\Console\Commands;
 use Illuminate\Console\Command;
 use Molitor\Unas\Repositories\UnasShopRepository;
 use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
-use Molitor\Unas\Services\UnasProductService;
+use Molitor\Unas\Services\UnasProductCategoryService;
 
-class UnasDownloadProducts extends Command
+class UnasDownloadProductCategories extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'unas:download-products';
+    protected $signature = 'unas:download-product-categories';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Download products from UNAS';
+    protected $description = 'Download product categories from UNAS';
 
     /**
      * Create a new command instance.
@@ -43,13 +43,14 @@ class UnasDownloadProducts extends Command
         /** @var UnasShopRepository $unasShopRepository */
         $unasShopRepository = app(UnasShopRepositoryInterface::class);
 
-        /** @var UnasProductService $unasProductService */
-        $unasProductService = app(UnasProductService::class);
+        /** @var UnasProductCategoryService $unasProductCategoryService */
+        $unasProductCategoryService = app(UnasProductCategoryService::class);
 
         foreach ($unasShopRepository->getEnableShops() as $shop) {
-            $this->info("Downloading products for UNAS shop: {$shop->name}");
-            $unasProductService->downloadProducts($shop);
+            $this->info("Downloading product categories for UNAS shop: {$shop->name}");
+            $unasProductCategoryService->repairCategories($shop);
         }
         return 0;
     }
 }
+

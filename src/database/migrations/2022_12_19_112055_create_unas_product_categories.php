@@ -30,7 +30,6 @@ class CreateUnasProductCategories extends Migration
             $table->boolean('display_menu')->default(true);
 
             $table->string('image_url')->nullable();
-            $table->unsignedBigInteger('file_id')->nullable();
 
             $table->unsignedBigInteger('remote_id')->nullable();
             $table->boolean('changed')->default(false);

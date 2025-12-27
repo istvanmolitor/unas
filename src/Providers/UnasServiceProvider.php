@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Molitor\Product\Events\ProductUpdateEvent;
 use Molitor\Setting\Services\SettingHandlerService;
 use Molitor\Unas\Console\Commands\UnasDownloadProducts;
+use Molitor\Unas\Console\Commands\UnasDownloadProductCategories;
 use Molitor\Unas\Console\Commands\UnasDownloadOrders;
 use Molitor\Unas\Console\Commands\UnasRepairCommand;
 use Molitor\Unas\Console\Commands\UnasSync;
@@ -45,6 +46,7 @@ class UnasServiceProvider extends EventServiceProvider
             UnasRepairCommand::class,
             UnasSync::class,
             UnasDownloadProducts::class,
+            UnasDownloadProductCategories::class,
             UnasDownloadOrders::class,
         ]);
 
