@@ -35,4 +35,9 @@ class UnasProductParameter extends Model
     {
         return $this->belongsTo(UnasShop::class, 'unas_shop_id');
     }
+
+    public function language()
+    {
+        return $this->belongsTo(\Molitor\Language\Models\Language::class, 'language_id');
+    }
 }

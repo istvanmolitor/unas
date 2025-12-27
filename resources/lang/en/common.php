@@ -73,5 +73,7 @@ return [
     'product_images' => 'Images',
     'image_data' => 'Image Data',
     'image' => 'Image',
+    'yes' => 'Yes',
+    'no' => 'No',
 ];
 

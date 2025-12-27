@@ -73,4 +73,6 @@ return [
     'product_images' => 'Képek',
     'image_data' => 'Kép adatok',
     'image' => 'Kép',
+    'yes' => 'Igen',
+    'no' => 'Nem',
 ];

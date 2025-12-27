@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
 use Molitor\Unas\Filament\Resources\UnasProductCategoryResource;
 use Molitor\Unas\Filament\Resources\UnasProductResource;
+use Molitor\Unas\Filament\Resources\UnasProductParameterResource;
 use Molitor\Unas\Filament\Resources\UnasShopResource;
 
 class ViewUnasShop extends ViewRecord
@@ -70,7 +71,9 @@ class ViewUnasShop extends ViewRecord
                             ->color('primary'),
                         TextEntry::make('shopProductParameters_count')
                             ->label(__('unas::common.product_parameters_count'))
-                            ->state(fn ($record) => $record->shopProductParameters()->count()),
+                            ->state(fn ($record) => $record->shopProductParameters()->count())
+                            ->url(fn ($record) => UnasProductParameterResource::getUrl('index', ['shop_id' => $record->getKey()]))
+                            ->color('primary'),
                     ])
                     ->columns(3),
                 Fieldset::make(__('unas::common.timestamps'))
