@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Repositories;
 
+use Molitor\Language\Models\Language;
 use Molitor\Product\Models\ProductField;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProductParameter;
@@ -99,5 +100,20 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
         return $this->shopProductParameter->withTrashed()
             ->where('remote_id', $id)
             ->forceDelete();
+    }
+
+    public function getByRemoteId(UnasShop $shop, int $remoteId): UnasProductParameter|null
+    {
+        return $this->shopProductParameter->where('unas_shop_id', $shop->id)
+            ->where('remote_id', $remoteId)
+            ->first();
+    }
+
+    public function getByName(UnasShop $shop, string $name, Language $language): UnasProductParameter|null
+    {
+        return $this->shopProductParameter->where('unas_shop_id', $shop->id)
+            ->where('name', $name)
+            ->where('language_id', $language->id)
+            ->first();
     }
 }

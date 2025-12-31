@@ -10,7 +10,7 @@ use Molitor\Unas\Repositories\UnasProductParameterRepositoryInterface;
 class UnasProductParameterService extends UnasService
 {
     public function __construct(
-        private UnasProductParameterRepositoryInterface $unasShopProductParameter,
+        private UnasProductParameterRepositoryInterface $unasProductParameterRepository,
         private LanguageRepositoryInterface             $languageRepository
     )
     {
@@ -18,22 +18,54 @@ class UnasProductParameterService extends UnasService
 
     public function repairParameters(UnasShop $shop): void
     {
-        $this->unasShopProductParameter->forceDeleteByShop($shop);
+        $this->unasProductParameterRepository->forceDeleteByShop($shop);
+        $this->downloadParameters($shop);
+    }
 
+    public function getByResult(UnasShop $shop, array $resultProductParameter): UnasProductParameter|null
+    {
+        $paremeter = $this->unasProductParameterRepository->getByRemoteId($shop, (int)$resultProductParameter['Id']);
+        if($paremeter) {
+            return $paremeter;
+        }
+
+        $language = $this->languageRepository->getByCode($resultProductParameter['Lang']);
+        $paremeter = $this->unasProductParameterRepository->getByName(
+            $shop,
+            $resultProductParameter['Name'],
+            $language
+        );
+        if ($paremeter) {
+            if($paremeter->remote_id === null) {
+                $paremeter->remote_id = (int)$resultProductParameter['Id'];
+                $paremeter->save();
+            }
+            return $paremeter;
+        }
+
+        return UnasProductParameter::create(
+            [
+                'unas_shop_id' => $shop->id,
+                'name' => $resultProductParameter['Name'],
+                'type' => $resultProductParameter['Type'],
+                'language_id' => $language->id,
+                'order' => (int)$resultProductParameter['Order'],
+                'remote_id' => (int)$resultProductParameter['Id'],
+            ]
+        );
+    }
+
+    public function downloadParameters(UnasShop $shop): void
+    {
         $endpoint = $this->makeGetProductParameterEndpoint($shop->api_key);
         $endpoint->execute();
 
         foreach ($endpoint->getResultProductParameters() as $resultProductParameter) {
-            UnasProductParameter::create(
-                [
-                    'unas_shop_id' => $shop->id,
-                    'name' => $resultProductParameter['Name'],
-                    'type' => $resultProductParameter['Type'],
-                    'language_id' => $this->languageRepository->getByCode($resultProductParameter['Lang'])->id,
-                    'order' => (int)$resultProductParameter['Order'],
-                    'remote_id' => (int)$resultProductParameter['Id'],
-                ]
-            );
+            $parameter = $this->getByResult($shop, $resultProductParameter);
+            $parameter->name = $resultProductParameter['Name'];
+            $parameter->type = $resultProductParameter['Type'];
+            $parameter->order = (int)$resultProductParameter['Order'];
+            $parameter->save();
         }
     }
 
@@ -125,7 +157,7 @@ class UnasProductParameterService extends UnasService
         foreach ($endpoint->getResultProductParameters() as $resultProductParameter) {
             if ($resultProductParameter['Status'] == self::STATUS_OK) {
                 $i++;
-                $this->unasShopProductParameter->forceDeleteByRemoteId($resultProductParameter['Id']);
+                $this->unasProductParameterRepository->forceDeleteByRemoteId($resultProductParameter['Id']);
             }
         }
         return $i;

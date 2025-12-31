@@ -2,7 +2,9 @@
 
 namespace Molitor\Unas\Repositories;
 
+use Molitor\Language\Models\Language;
 use Molitor\Product\Models\ProductField;
+use Molitor\Unas\Models\UnasProductParameter;
 use Molitor\Unas\Models\UnasShop;
 
 interface UnasProductParameterRepositoryInterface
@@ -22,4 +24,8 @@ interface UnasProductParameterRepositoryInterface
     public function forceDeleteByShop(UnasShop $shop): void;
 
     public function forceDeleteByRemoteId(int $id): bool;
+
+    public function getByRemoteId(UnasShop $shop, int $remoteId): UnasProductParameter|null;
+
+    public function getByName(UnasShop $shop, string $name, Language $language): UnasProductParameter|null;
 }

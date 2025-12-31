@@ -80,59 +80,30 @@ class UnasProductDtoService
         $dtoImages = $productDto->getImages();
 
         $existingImages = $unasProduct->images()->get();
-        $existingUrls = $existingImages->pluck('url')->toArray();
+        $existingUrls = $existingImages->pluck('image_url')->toArray();
         $dtoUrls = array_map(fn($image) => $image->url, $dtoImages);
 
         $urlsToDelete = array_diff($existingUrls, $dtoUrls);
         if (!empty($urlsToDelete)) {
-            $unasProduct->images()->whereIn('url', $urlsToDelete)->delete();
+            $unasProduct->images()->whereIn('image_url', $urlsToDelete)->delete();
         }
 
         foreach ($dtoImages as $index => $imageDto) {
-            $unasProductImage = $existingImages->firstWhere('url', $imageDto->url);
+            $unasProductImage = $existingImages->firstWhere('image_url', $imageDto->url);
             if(!$unasProductImage) {
                 $unasProductImage = new UnasProductImage();
                 $unasProductImage->unas_product_id = $unasProduct->id;
-                $unasProductImage->url = $imageDto->url;
+                $unasProductImage->image_url = $imageDto->url;
             }
 
             $unasProductImage->sort = $index;
-            $unasProductImage->alt = $imageDto->getAttributeDto('alt');
+            $unasProductImage->alt = $imageDto->alt;
             $unasProductImage->save();
         }
     }
 
     protected function syncParameters(UnasProduct $unasProduct, ProductDto $productDto): void
     {
-        $dtoAttributes = $productDto->getAttributes();
 
-        if (empty($dtoAttributes)) {
-            // If no attributes in DTO, detach all
-            $unasProduct->parameters()->detach();
-            return;
-        }
-
-        $syncData = [];
-        foreach ($dtoAttributes as $index => $attributeDto) {
-            $parameter = UnasProductParameter::firstOrCreate(
-                [
-                    'unas_shop_id' => $unasProduct->unas_shop_id,
-                    'product_field_id' => $attributeDto->field->id,
-                ],
-                [
-                    'name' => $attributeDto->field->name,
-                    'type' => $attributeDto->field->type ?? 'text',
-                    'language_id' => 1, // Default language, adjust as needed
-                    'order' => $index,
-                ]
-            );
-
-            $syncData[$parameter->id] = [
-                'product_field_option_id' => $attributeDto->option->id ?? null,
-                'value' => $attributeDto->option->value ?? null,
-            ];
-        }
-
-        $unasProduct->parameters()->sync($syncData);
     }
 }

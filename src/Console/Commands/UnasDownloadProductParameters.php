@@ -48,7 +48,7 @@ class UnasDownloadProductParameters extends Command
 
         foreach ($unasShopRepository->getEnableShops() as $shop) {
             $this->info("Downloading product parameters for UNAS shop: {$shop->name}");
-            $unasProductParameterService->repairParameters($shop);
+            $unasProductParameterService->downloadParameters($shop);
         }
         return 0;
     }
