@@ -16,6 +16,13 @@ class GetCategoryEndpoint extends Endpoint
         return 'Params';
     }
 
+    public function setIdRequestData(int $id): void
+    {
+        $this->setRequestData([
+            'Id' => $id,
+        ]);
+    }
+
     public function getResultCategories(): array
     {
         if (isset($this->result['Category'])) {

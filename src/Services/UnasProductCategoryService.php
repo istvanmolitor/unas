@@ -52,26 +52,9 @@ class UnasProductCategoryService extends UnasService
 
     public function repairCategories(UnasShop $shop): void
     {
-        $this->unasProductCategoryRepository->forceDeleteByShop($shop);
-
-        $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
-        $endpoint->execute();
-
-        $treeBuilder = new CategoryTreeBuilder();
-        foreach ($endpoint->getResultCategories() as $resultCategory) {
-            $treeBuilder->add((int)$resultCategory['Id'], (int)$resultCategory['Parent']['Id'], $resultCategory);
-        }
-
-        foreach ($treeBuilder->getChildrenIds(0) as $id) {
-            $item = $treeBuilder->getItem($id);
-            $rootCategory = $this->unasProductCategoryRepository->createRootCategory($shop, $item['Name']);
-            if($rootCategory) {
-                $this->fillUnasProductCategoryByItem($rootCategory, $item);
-                foreach ($treeBuilder->getChildrenIds($id) as $childrenId) {
-                    $this->createCategory($treeBuilder, $rootCategory, $childrenId);
-                }
-            }
-        }
+        // Delegated to UnasProductCategoryApiDtoService
+        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        $apiService->syncFromApi($shop);
     }
 
     public function deleteCategory(UnasProductCategory $category)
@@ -109,125 +92,18 @@ class UnasProductCategoryService extends UnasService
         }
     }
 
-    private function createCategory(CategoryTreeBuilder $treeBuilder, UnasProductCategory $productCategory, int $id): void
-    {
-        $item = $treeBuilder->getItem($id);
-        $subCategory = $this->unasProductCategoryRepository->createSubCategory($productCategory, $item['Name']);
-        if($subCategory) {
-            $this->fillUnasProductCategoryByItem($subCategory, $item);
-            foreach ($treeBuilder->getChildrenIds($id) as $childrenId) {
-                $this->createCategory($treeBuilder, $subCategory, $childrenId);
-            }
-        }
-    }
-
-    private function fillUnasProductCategoryByItem(UnasProductCategory $category, array $item): void
-    {
-        $category->title = $item['AutomaticMeta']['Title'];
-        $category->keywords = $item['AutomaticMeta']['Keywords'];
-        $category->description = $item['AutomaticMeta']['Description'];
-        $category->display_page = $item['Display']['Page'] === 'yes';
-        $category->display_menu = $item['Display']['Menu'] === 'yes';
-        $category->remote_id = (int)$item['Id'];
-        $category->save();
-    }
-
     public function syncDeletes(UnasShop $shop): int
     {
-        $productCategories = $this->unasProductCategoryRepository->getDeletedCategories($shop);
-        if ($productCategories->count() == 0) {
-            return 0;
-        }
-
-        $endpoint = $this->makeSetCategoryEndpoint($shop->api_key);
-
-        $requestData = [];
-        foreach ($productCategories as $productCategory) {
-            $requestData['@Category'][] = [
-                'Action' => self::ACTION_DELETE,
-                'Id' => $productCategory->remote_id,
-            ];
-        }
-
-        $endpoint->setRequestData($requestData);
-        $endpoint->execute();
-
-        $i = 0;
-        foreach ($endpoint->getResultCategories() as $resultCategory) {
-            if ($resultCategory['Status'] === self::STATUS_OK) {
-                $this->unasProductCategoryRepository->forceDeleteByRemoteId($resultCategory['Id']);
-                $i++;
-            }
-        }
-
-        if ($i > 0) {
-            $this->syncDeletes($shop);
-        }
-
-        return $i;
+        // Delegated to UnasProductCategoryApiDtoService
+        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        return $apiService->syncDeletes($shop);
     }
 
     public function syncChanges(UnasShop $shop): bool
     {
-        $productCategories = $this->unasProductCategoryRepository->getChangedByShop($shop);
-
-        if ($productCategories->count() == 0) {
-            return false;
-        }
-
-        $endpoint = $this->makeSetCategoryEndpoint($shop->api_key);
-
-        $requestData = [];
-
-        /** @var UnasProductCategory $productCategory */
-        foreach ($productCategories as $productCategory) {
-            $requestCategory = [
-                'Name' => $productCategory->name,
-                'Display' => [
-                    'Page' => $this->getBooleanString($productCategory->display_page),
-                    'Menu' => $this->getBooleanString($productCategory->display_menu),
-                ],
-            ];
-
-            if ($productCategory->image_url) {
-                $requestCategory['Image']['Url'] = $productCategory->image_url;
-                $requestCategory['Image']['OG'] = $productCategory->image_url;
-            }
-
-            if ($productCategory->remote_id) {
-                $requestCategory['Action'] = self::ACTION_UPDATE;
-                $requestCategory['Id'] = $productCategory->remote_id;
-            } else {
-                $requestCategory['Action'] = self::ACTION_CREATE;
-            }
-
-            $parent = $productCategory->parent;
-            if ($parent) {
-                $requestCategory['Parent']['Id'] = $parent->remote_id;
-            }
-
-            $requestData['@Category'][] = $requestCategory;
-        }
-
-        $endpoint->setRequestData($requestData);
-        $endpoint->execute();
-
-        $resultCategories = $endpoint->getResultCategories();
-
-        foreach ($productCategories as $i => $productCategory) {
-            if (isset($resultCategories[$i])) {
-                $resultCategory = $resultCategories[$i];
-                if ($resultCategory['Status'] == self::STATUS_OK) {
-                    if ($resultCategory['Action'] == self::ACTION_CREATE) {
-                        $productCategory->remote_id = $resultCategory['Id'];
-                    }
-                    $productCategory->changed = 0;
-                    $productCategory->save();
-                }
-            }
-        }
-
-        return true;
+        // Delegated to UnasProductCategoryApiDtoService
+        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        return $apiService->syncChanges($shop);
     }
 
     public function getPath(UnasProductCategory $category): array

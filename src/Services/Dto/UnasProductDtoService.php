@@ -3,11 +3,9 @@
 namespace Molitor\Unas\Services\Dto;
 
 use Molitor\Product\Dto\ProductDto;
-use Molitor\Product\Services\ProductImageService;
 use Molitor\Product\Services\Dto\ProductUnitDtoService;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductImage;
-use Molitor\Unas\Models\UnasProductParameter;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 
