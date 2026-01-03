@@ -22,10 +22,7 @@ class UnasProductCategoryResource extends Resource
 
     protected static \BackedEnum|null|string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationGroup(): string
     {

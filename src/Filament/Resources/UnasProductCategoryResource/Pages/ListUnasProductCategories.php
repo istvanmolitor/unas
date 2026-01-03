@@ -2,6 +2,7 @@
 
 namespace Molitor\Unas\Filament\Resources\UnasProductCategoryResource\Pages;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -43,6 +44,11 @@ class ListUnasProductCategories extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('tree_view')
+                ->label('Fa nézet')
+                ->icon('heroicon-o-rectangle-group')
+                ->url(route('filament.admin.pages.unas-product-categories-page', ['shop_id' => $this->unasShopId]))
+                ->color('gray'),
             CreateAction::make()
                 ->label(__('unas::common.new_category'))
                 ->icon('heroicon-o-plus')
