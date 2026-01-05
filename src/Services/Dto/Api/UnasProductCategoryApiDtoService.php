@@ -4,15 +4,17 @@ namespace Molitor\Unas\Services\Dto\Api;
 
 use Molitor\Product\Dto\ImageDto;
 use Molitor\Product\Dto\ProductCategoryDto;
+use Molitor\Tree\TreeIdHandler;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
-use Molitor\Unas\Services\CategoryTreeBuilder;
 use Molitor\Unas\Services\Dto\UnasProductCategoryDtoService;
 use Molitor\Unas\Services\UnasService;
 
 class UnasProductCategoryApiDtoService extends UnasService
 {
+    private array $cache = [];
+
     public function __construct(
         protected UnasProductCategoryRepositoryInterface $unasProductCategoryRepository,
         protected UnasProductCategoryDtoService $categoryDtoService,
@@ -20,53 +22,51 @@ class UnasProductCategoryApiDtoService extends UnasService
     {
     }
 
-    public function fetchCategoriesFromApi(UnasShop $shop): array
+    private function getHandler(UnasShop $shop): TreeIdHandler
     {
-        $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
-        $endpoint->execute();
+        if(!array_key_exists($shop->id, $this->cache)) {
+            $this->cache[$shop->id] = new TreeIdHandler();
+            $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
+            $endpoint->execute();
+
+            foreach ($endpoint->getResultCategories() as $resultCategory) {
+                $this->cache[$shop->id]->add((int)$resultCategory['Id'], $resultCategory, (int)$resultCategory['Parent']['Id']);
+            }
+        }
+        return $this->cache[$shop->id];
+    }
+
+    public function fetchCategoryDtos(UnasShop $shop): array
+    {
+        $handler = $this->getHandler($shop);
 
         $categories = [];
-        foreach ($endpoint->getResultCategories() as $resultCategory) {
-            $categories[] = $this->makeProductCategoryDto($resultCategory);
+        foreach ($handler->getIds() as $id) {
+            $categories[] = $this->getProductCategoryDtoByRemoteId($shop, $id);
         }
 
         return $categories;
     }
 
-    public function getProductCategoryDtoByRemoteId(UnasShop $shop, int $remoteId): ?ProductCategoryDto
+    public function getProductCategoryDtoByRemoteId(UnasShop $shop, int $id): ProductCategoryDto
     {
-        $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
-        $endpoint->setIdRequestData($remoteId);
-        $endpoint->execute();
+        $handler = $this->getHandler($shop);
 
-        $categories = $endpoint->getResultCategories();
-        if(!count($categories)) {
-            return null;
-        }
+        $apiData = $handler->getData($id);
 
-        return $this->makeProductCategoryDto($categories[0]);
-    }
-
-    /**
-     * Create DTO from API response
-     */
-    public function makeProductCategoryDto(array $apiData): ProductCategoryDto
-    {
         $dto = new ProductCategoryDto();
         $dto->id = (int)$apiData['Id'];
         $dto->source = 'unas_api';
 
-        // Set the category name/path
-        if (isset($apiData['Name'])) {
-            $dto->path->addItem()->set('hu', $apiData['Name']);
-        }
+        $path = array_map(function ($item) {
+            return $item['Name'];
+        }, $handler->getPath($id));
+        $dto->path->setArrayPath('hu', $path);
 
-        // Set description from AutomaticMeta
         if (isset($apiData['AutomaticMeta']['Description'])) {
             $dto->description->set('hu', $apiData['AutomaticMeta']['Description']);
         }
 
-        // Set image if available
         if (isset($apiData['Image']['Url'])) {
             $imageDto = new ImageDto();
             $imageDto->url = $apiData['Image']['Url'];

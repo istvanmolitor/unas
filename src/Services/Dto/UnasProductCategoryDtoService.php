@@ -46,23 +46,11 @@ class UnasProductCategoryDtoService
         return $dto;
     }
 
-    /**
-     * Save DTO to database as UnasProductCategory
-     */
     public function saveDto(UnasShop $shop, ProductCategoryDto $dto): ?UnasProductCategory
     {
-        // Get or create the category by path
-        $path = $dto->path->getArrayPath('hu');
-        $category = $this->getOrCreateByPath($shop, $path);
-
-        if (!$category) {
-            return null;
-        }
-
-        // Fill the category with DTO data
+        $category = $this->makeModel($shop, $dto);
         $this->fillModel($category, $dto);
         $category->save();
-
         return $category;
     }
 
