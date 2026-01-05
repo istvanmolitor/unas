@@ -4,7 +4,7 @@ namespace Molitor\Unas\Services\Dto\Api;
 
 use Molitor\Product\Dto\ImageDto;
 use Molitor\Product\Dto\ProductCategoryDto;
-use Molitor\Tree\TreeIdHandler;
+use Molitor\Tree\IdTreeBuilder;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
@@ -22,10 +22,10 @@ class UnasProductCategoryApiDtoService extends UnasService
     {
     }
 
-    private function getHandler(UnasShop $shop): TreeIdHandler
+    private function getIdTreeBuilder(UnasShop $shop): IdTreeBuilder
     {
         if(!array_key_exists($shop->id, $this->cache)) {
-            $this->cache[$shop->id] = new TreeIdHandler();
+            $this->cache[$shop->id] = new IdTreeBuilder();
             $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
             $endpoint->execute();
 
@@ -38,21 +38,23 @@ class UnasProductCategoryApiDtoService extends UnasService
 
     public function fetchCategoryDtos(UnasShop $shop): array
     {
-        $handler = $this->getHandler($shop);
+        $builder = $this->getIdTreeBuilder($shop);
 
         $categories = [];
-        foreach ($handler->getIds() as $id) {
+        foreach ($builder->getIds() as $id) {
             $categories[] = $this->getProductCategoryDtoByRemoteId($shop, $id);
         }
 
         return $categories;
     }
 
-    public function getProductCategoryDtoByRemoteId(UnasShop $shop, int $id): ProductCategoryDto
+    public function getProductCategoryDtoByRemoteId(UnasShop $shop, int $id): ?ProductCategoryDto
     {
-        $handler = $this->getHandler($shop);
-
-        $apiData = $handler->getData($id);
+        $builder = $this->getIdTreeBuilder($shop);
+        $apiData = $builder->getData($id);
+        if($apiData === null) {
+            return null;
+        }
 
         $dto = new ProductCategoryDto();
         $dto->id = (int)$apiData['Id'];
@@ -60,7 +62,7 @@ class UnasProductCategoryApiDtoService extends UnasService
 
         $path = array_map(function ($item) {
             return $item['Name'];
-        }, $handler->getPath($id));
+        }, $builder->getPath($id));
         $dto->path->setArrayPath('hu', $path);
 
         if (isset($apiData['AutomaticMeta']['Description'])) {
