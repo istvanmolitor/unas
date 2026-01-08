@@ -4,7 +4,7 @@ namespace Molitor\Unas\Services\Dto\Api;
 
 use Molitor\Product\Dto\ImageDto;
 use Molitor\Product\Dto\ProductCategoryDto;
-use Molitor\Tree\IdTreeBuilder;
+use Molitor\Tree\TreeBuilder;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
@@ -22,10 +22,10 @@ class UnasProductCategoryApiDtoService extends UnasService
     {
     }
 
-    private function getIdTreeBuilder(UnasShop $shop): IdTreeBuilder
+    private function getIdTreeBuilder(UnasShop $shop): TreeBuilder
     {
         if(!array_key_exists($shop->id, $this->cache)) {
-            $this->cache[$shop->id] = new IdTreeBuilder();
+            $this->cache[$shop->id] = new TreeBuilder();
             $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
             $endpoint->execute();
 
