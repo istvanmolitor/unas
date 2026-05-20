@@ -3,9 +3,8 @@
 namespace Molitor\Unas\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
-use Livewire\Livewire;
 use Molitor\Product\Events\ProductUpdateEvent;
-use Molitor\Setting\Services\SettingHandlerService;
+use Molitor\Setting\Services\SettingHandler;
 use Molitor\Unas\Console\Commands\UnasDownloadProductParameters;
 use Molitor\Unas\Console\Commands\UnasDownloadProducts;
 use Molitor\Unas\Console\Commands\UnasDownloadProductCategories;
@@ -13,7 +12,6 @@ use Molitor\Unas\Console\Commands\UnasDownloadOrders;
 use Molitor\Unas\Console\Commands\UnasRepairCommand;
 use Molitor\Unas\Console\Commands\UnasSync;
 use Molitor\Unas\Listeners\ProductUpdateListener;
-use Molitor\Unas\Livewire\UnasCategoryTreeItem;
 use Molitor\Unas\Repositories\UnasOrderRepository;
 use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductAttributeRepository;
@@ -45,8 +43,7 @@ class UnasServiceProvider extends EventServiceProvider
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'unas');
         $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'unas');
-
-        Livewire::component('unas-category-tree-item', UnasCategoryTreeItem::class);
+        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
 
         $this->commands([
             UnasRepairCommand::class,
@@ -57,7 +54,9 @@ class UnasServiceProvider extends EventServiceProvider
             UnasDownloadOrders::class,
         ]);
 
-        $this->app->make(SettingHandlerService::class)->register(UnasSettingForm::class);
+        if ($this->app->bound(SettingHandler::class)) {
+            $this->app->make(SettingHandler::class)->registerSettingForm(UnasSettingForm::class);
+        }
     }
 
     public function register()
