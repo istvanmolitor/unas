@@ -7,6 +7,8 @@ namespace Molitor\Unas\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Molitor\Admin\Http\Resources\DataTableResource;
+use Molitor\Unas\Http\Requests\StoreUnasProductRequest;
+use Molitor\Unas\Http\Requests\UpdateUnasProductRequest;
 use Molitor\Unas\Http\Resources\UnasProductResource;
 use Molitor\Unas\Models\UnasProduct;
 
@@ -43,9 +45,27 @@ class UnasProductController
         ));
     }
 
+    public function store(StoreUnasProductRequest $request): JsonResponse
+    {
+        $unasProduct = UnasProduct::query()->create($request->validated());
+
+        return response()->json([
+            'data' => new UnasProductResource($unasProduct),
+        ], 201);
+    }
+
     public function show(UnasProduct $unasProduct): JsonResponse
     {
         $unasProduct->load(['shop', 'product', 'images', 'attributes', 'parameters']);
+
+        return response()->json([
+            'data' => new UnasProductResource($unasProduct),
+        ]);
+    }
+
+    public function update(UpdateUnasProductRequest $request, UnasProduct $unasProduct): JsonResponse
+    {
+        $unasProduct->update($request->validated());
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

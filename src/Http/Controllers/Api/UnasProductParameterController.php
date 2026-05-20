@@ -7,6 +7,8 @@ namespace Molitor\Unas\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Molitor\Admin\Http\Resources\DataTableResource;
+use Molitor\Unas\Http\Requests\StoreUnasProductParameterRequest;
+use Molitor\Unas\Http\Requests\UpdateUnasProductParameterRequest;
 use Molitor\Unas\Http\Resources\UnasProductParameterResource;
 use Molitor\Unas\Models\UnasProductParameter;
 
@@ -43,9 +45,27 @@ class UnasProductParameterController
         ));
     }
 
+    public function store(StoreUnasProductParameterRequest $request): JsonResponse
+    {
+        $parameter = UnasProductParameter::query()->create($request->validated());
+
+        return response()->json([
+            'data' => new UnasProductParameterResource($parameter),
+        ], 201);
+    }
+
     public function show(UnasProductParameter $unasProductParameter): JsonResponse
     {
         $unasProductParameter->load(['shop', 'language']);
+
+        return response()->json([
+            'data' => new UnasProductParameterResource($unasProductParameter),
+        ]);
+    }
+
+    public function update(UpdateUnasProductParameterRequest $request, UnasProductParameter $unasProductParameter): JsonResponse
+    {
+        $unasProductParameter->update($request->validated());
 
         return response()->json([
             'data' => new UnasProductParameterResource($unasProductParameter),
