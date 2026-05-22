@@ -9,4 +9,3 @@ return [
     'type' => 'Type',
     'order' => 'Order',
 ];
-

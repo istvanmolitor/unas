@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
+use Molitor\Product\Models\Product;
 use Molitor\Product\Models\ProductUnit;
 use Molitor\Product\Repositories\ProductRepository;
-use Molitor\Unas\Services\Endpoint;
-use Molitor\Product\Models\Product;
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasProductCategoryProduct;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Collection;
+use Molitor\Unas\Models\UnasShop;
 
 class UnasProductRepository implements UnasProductRepositoryInterface
 {
@@ -23,9 +21,8 @@ class UnasProductRepository implements UnasProductRepositoryInterface
 
     public function __construct(
         private CurrencyRepositoryInterface $currencyRepository
-    )
-    {
-        $this->shopProduct = new UnasProduct();
+    ) {
+        $this->shopProduct = new UnasProduct;
     }
 
     public function getShopProducts(UnasShop $shop): Collection
@@ -38,9 +35,9 @@ class UnasProductRepository implements UnasProductRepositoryInterface
     public function skuExists(UnasShop $shop, string $sku): bool
     {
         return $this->shopProduct
-                ->where('unas_shop_id', $shop->id)
-                ->where('sku', $sku)
-                ->count() > 0;
+            ->where('unas_shop_id', $shop->id)
+            ->where('sku', $sku)
+            ->count() > 0;
     }
 
     public function createSku(UnasShop $shop, string $sku): string
@@ -50,9 +47,10 @@ class UnasProductRepository implements UnasProductRepositoryInterface
 
         $i = 2;
         while ($this->skuExists($shop, $newSku)) {
-            $newSku = $baseSku . '-' . $i;
+            $newSku = $baseSku.'-'.$i;
             $i++;
         }
+
         return $newSku;
     }
 
@@ -61,19 +59,19 @@ class UnasProductRepository implements UnasProductRepositoryInterface
         if ($remoteId === null) {
             return null;
         }
+
         return $this->shopProduct->where('unas_shop_id', $unasShop->id)->where('remote_id', $remoteId)->first();
     }
 
     public function createProduct(
-        UnasShop    $shop,
-        int         $remoteId,
-        string      $sku,
-        string      $name,
-        ?string     $description,
-        ?float      $price,
+        UnasShop $shop,
+        int $remoteId,
+        string $sku,
+        string $name,
+        ?string $description,
+        ?float $price,
         ProductUnit $productUnit
-    ): UnasProduct
-    {
+    ): UnasProduct {
         $product = $this->findByRemoteId($shop, $remoteId);
         if ($product) {
             $product->sku = $sku;
@@ -97,6 +95,7 @@ class UnasProductRepository implements UnasProductRepositoryInterface
                 ]
             );
         }
+
         return $product;
     }
 
@@ -109,7 +108,7 @@ class UnasProductRepository implements UnasProductRepositoryInterface
             ->where('unas_product_category_id', $shopProductCategory->id)
             ->count();
 
-        if (!$exists) {
+        if (! $exists) {
             UnasProductCategoryProduct::create(
                 [
                     'unas_product_id' => $shopProduct->id,
@@ -142,10 +141,12 @@ class UnasProductRepository implements UnasProductRepositoryInterface
             ->delete();
 
         $count = UnasProductCategoryProduct::where('unas_product_id', $shopProduct->id)->count();
-        if (!$count) {
+        if (! $count) {
             $shopProduct->delete();
+
             return true;
         }
+
         return false;
     }
 
@@ -160,6 +161,7 @@ class UnasProductRepository implements UnasProductRepositoryInterface
             ->where('unas_products.unas_shop_id', $shop->id)
             ->delete();
         $shop->shopProducts()->delete();
+
         return $this;
     }
 
@@ -176,10 +178,10 @@ class UnasProductRepository implements UnasProductRepositoryInterface
 
         $currency = $this->currencyRepository->getByCode('HUF');
 
-        $productRepository = new ProductRepository();
+        $productRepository = new ProductRepository;
         $product = $productRepository->save(
-            (string)$shopProduct->sku,
-            (string)$shopProduct->name,
+            (string) $shopProduct->sku,
+            (string) $shopProduct->name,
             $shopProduct->description,
             $shopProduct->price,
             $currency,
@@ -191,8 +193,6 @@ class UnasProductRepository implements UnasProductRepositoryInterface
 
     /**
      * Törli a termékeket amik nincsenek a törzsben.
-     * @param UnasShop $shop
-     * @return void
      */
     public function clearShop(UnasShop $shop): void
     {
@@ -233,7 +233,7 @@ class UnasProductRepository implements UnasProductRepositoryInterface
             ->forceDelete();
     }
 
-    public function getBySku(UnasShop $unasShop, string $sku): UnasProduct|null
+    public function getBySku(UnasShop $unasShop, string $sku): ?UnasProduct
     {
         return $this->shopProduct
             ->where('unas_shop_id', $unasShop->id)

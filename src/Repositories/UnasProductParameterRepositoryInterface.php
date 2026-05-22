@@ -25,7 +25,7 @@ interface UnasProductParameterRepositoryInterface
 
     public function forceDeleteByRemoteId(int $id): bool;
 
-    public function getByRemoteId(UnasShop $shop, int $remoteId): UnasProductParameter|null;
+    public function getByRemoteId(UnasShop $shop, int $remoteId): ?UnasProductParameter;
 
-    public function getByName(UnasShop $shop, string $name, Language $language): UnasProductParameter|null;
+    public function getByName(UnasShop $shop, string $name, Language $language): ?UnasProductParameter;
 }

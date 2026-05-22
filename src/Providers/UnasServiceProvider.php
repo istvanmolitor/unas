@@ -5,10 +5,10 @@ namespace Molitor\Unas\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Molitor\Product\Events\ProductUpdateEvent;
 use Molitor\Setting\Services\SettingHandler;
+use Molitor\Unas\Console\Commands\UnasDownloadOrders;
+use Molitor\Unas\Console\Commands\UnasDownloadProductCategories;
 use Molitor\Unas\Console\Commands\UnasDownloadProductParameters;
 use Molitor\Unas\Console\Commands\UnasDownloadProducts;
-use Molitor\Unas\Console\Commands\UnasDownloadProductCategories;
-use Molitor\Unas\Console\Commands\UnasDownloadOrders;
 use Molitor\Unas\Console\Commands\UnasRepairCommand;
 use Molitor\Unas\Console\Commands\UnasSync;
 use Molitor\Unas\Listeners\ProductUpdateListener;
@@ -40,10 +40,10 @@ class UnasServiceProvider extends EventServiceProvider
 
     public function boot()
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'unas');
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'unas');
-        $this->loadRoutesFrom(__DIR__ . '/../routes/api.php');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'unas');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'unas');
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
 
         $this->commands([
             UnasRepairCommand::class,

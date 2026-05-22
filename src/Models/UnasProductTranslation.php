@@ -6,7 +6,6 @@ use Molitor\Language\Models\TranslationModel;
 
 class UnasProductTranslation extends TranslationModel
 {
-
     public function getTranslatableModelClass(): string
     {
         return UnasProduct::class;

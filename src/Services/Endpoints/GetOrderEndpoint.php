@@ -6,7 +6,6 @@ use Carbon\Carbon;
 
 class GetOrderEndpoint extends Endpoint
 {
-
     protected function getEndpoint(): string
     {
         return 'shop/getOrder';
@@ -44,6 +43,7 @@ class GetOrderEndpoint extends Endpoint
                 return [$this->result['Order']];
             }
         }
+
         return [];
     }
 

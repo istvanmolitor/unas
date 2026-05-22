@@ -23,7 +23,7 @@ class UnasProductCategoryController
         }
 
         if ($search = $request->string('search')->toString()) {
-            $query->where('name', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%'.$search.'%');
         }
 
         $allowedSortFields = ['id', 'name', 'created_at'];

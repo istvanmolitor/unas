@@ -2,8 +2,8 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasOrder;
+use Molitor\Unas\Models\UnasShop;
 
 class UnasOrderRepository implements UnasOrderRepositoryInterface
 {
@@ -11,10 +11,10 @@ class UnasOrderRepository implements UnasOrderRepositoryInterface
 
     public function __construct()
     {
-        $this->unasOrder = new UnasOrder();
+        $this->unasOrder = new UnasOrder;
     }
 
-    public function getByRemoteId(int $remoteId): UnasOrder|null
+    public function getByRemoteId(int $remoteId): ?UnasOrder
     {
         return $this->unasOrder->where('remote_id', $remoteId)->first();
     }

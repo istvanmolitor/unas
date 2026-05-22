@@ -37,7 +37,7 @@ class UnasProductImage extends TranslatableModel
         return $this->belongsTo(UnasProduct::class, 'unas_product_id');
     }
 
-    public function getSrc(): string|null
+    public function getSrc(): ?string
     {
         return $this->image_url;
     }

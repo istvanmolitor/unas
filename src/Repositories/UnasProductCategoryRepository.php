@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Molitor\Unas\Repositories;
 
 use App\Services\TreeBuilder;
-use Molitor\Unas\Services\Endpoint;
-use Molitor\Unas\Models\UnasShop;
-use Molitor\Unas\Models\UnasProductCategory as Category;
-use Molitor\Unas\Models\UnasProductCategory;
 use Illuminate\Database\Eloquent\Collection;
+use Molitor\Unas\Models\UnasProductCategory;
+use Molitor\Unas\Models\UnasProductCategory as Category;
+use Molitor\Unas\Models\UnasShop;
 
 class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInterface
 {
@@ -17,7 +16,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
 
     public function __construct()
     {
-        $this->category = new Category();
+        $this->category = new Category;
     }
 
     public function getByShop(UnasShop $shop): Collection
@@ -28,11 +27,12 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
     public function getByShopWithRoot(UnasShop $shop): Collection
     {
         $categories = $this->getByShop($shop);
-        $categories->prepend((object)[
+        $categories->prepend((object) [
             'id' => 0,
             'name' => 'Főkategória',
             'parent_id' => null,
         ]);
+
         return $categories;
     }
 
@@ -45,20 +45,21 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
 
     public function getRootCategoryByName(UnasShop $shop, string $name): ?Category
     {
-        if(!isset($this->rootCategoryCache[$shop->id][$name])) {
+        if (! isset($this->rootCategoryCache[$shop->id][$name])) {
             $this->rootCategoryCache[$shop->id][$name] = $this->category
                 ->where('unas_shop_id', $shop->id)
                 ->where('parent_id', 0)
                 ->where('name', $name)
                 ->first();
         }
+
         return $this->rootCategoryCache[$shop->id][$name];
     }
 
     public function createRootCategory(UnasShop $shop, string $name): ?Category
     {
         $category = $this->getRootCategoryByName($shop, $name);
-        if (!$category) {
+        if (! $category) {
             $category = $this->category->create(
                 [
                     'unas_shop_id' => $shop->id,
@@ -69,7 +70,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
             );
             $this->rootCategoryCache[$shop->id][$name] = $category;
         }
-        if (!$category) {
+        if (! $category) {
             throw new \Exception('A gyökér kategóriát nem lehet létrehozni.');
         }
 
@@ -80,20 +81,21 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
 
     public function getSubCategoryByName(Category $parent, string $name): ?Category
     {
-        if(!isset($this->subCategoryCache[$parent->id][$name])) {
+        if (! isset($this->subCategoryCache[$parent->id][$name])) {
             $this->subCategoryCache[$parent->id][$name] = $this->category
                 ->where('unas_shop_id', $parent->unas_shop_id)
                 ->where('parent_id', $parent->id)
                 ->where('name', $name)
                 ->first();
         }
+
         return $this->subCategoryCache[$parent->id][$name];
     }
 
     public function createSubCategory(Category $parent, string $name): ?Category
     {
         $category = $this->getSubCategoryByName($parent, $name);
-        if (!$category) {
+        if (! $category) {
             $category = $this->category->create(
                 [
                     'unas_shop_id' => $parent->unas_shop_id,
@@ -104,7 +106,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
             );
             $this->subCategoryCache[$parent->id][$name] = $category;
         }
-        if (!$category) {
+        if (! $category) {
             throw new \Exception('A kategóriát nem lehet létrehozni.');
         }
 
@@ -115,6 +117,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
     {
         $path = $category->parent ? $this->getPathCategories($category->parent) : [];
         $path[] = $category;
+
         return $path;
     }
 
@@ -144,9 +147,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
             ->get();
     }
 
-    public function getAll()
-    {
-    }
+    public function getAll() {}
 
     private function insertRepairCategories(TreeBuilder $treeBuilder, UnasShop $shop, int $parentId, $remoteId)
     {
@@ -176,8 +177,8 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
     public function downloadImage(UnasProductCategory $shopProductCategory)
     {
         $url = $shopProductCategory->image_url;
-        if (!empty($url) && $shopProductCategory->file_id === null) {
-            $file = (new FileRepository())->storeUrl($url);
+        if (! empty($url) && $shopProductCategory->file_id === null) {
+            $file = (new FileRepository)->storeUrl($url);
             if ($file) {
                 $shopProductCategory->file_id = $file->id;
                 $shopProductCategory->save();
@@ -197,16 +198,16 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
 
     public function isChildOf(UnasProductCategory $parent, UnasProductCategory $category): bool
     {
-        if($parent->id === $category->id) {
+        if ($parent->id === $category->id) {
             return false;
         }
 
-        if($parent->id === $category->parent_id) {
+        if ($parent->id === $category->parent_id) {
             return true;
         }
 
         $category = $category->parent;
-        if(!$category) {
+        if (! $category) {
             return false;
         }
 

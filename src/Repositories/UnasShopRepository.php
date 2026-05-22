@@ -12,13 +12,12 @@ class UnasShopRepository implements UnasShopRepositoryInterface
     private UnasShop $shop;
 
     public function __construct(
-        private UnasProductRepositoryInterface          $UnasProductRepository,
-        private UnasProductCategoryRepositoryInterface  $UnasProductCategoryRepository,
+        private UnasProductRepositoryInterface $UnasProductRepository,
+        private UnasProductCategoryRepositoryInterface $UnasProductCategoryRepository,
         private UnasProductParameterRepositoryInterface $UnasProductParameterRepository,
-        private UnasOrderRepositoryInterface            $unasOrderRepository,
-    )
-    {
-        $this->shop = new UnasShop();
+        private UnasOrderRepositoryInterface $unasOrderRepository,
+    ) {
+        $this->shop = new UnasShop;
     }
 
     public function getByName($name): ?UnasShop
@@ -45,7 +44,7 @@ class UnasShopRepository implements UnasShopRepositoryInterface
         return $this->shop->where('enabled', 1)->get();
     }
 
-    public function getById(int $shopId): UnasShop|null
+    public function getById(int $shopId): ?UnasShop
     {
         return $this->shop->find($shopId);
     }

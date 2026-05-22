@@ -14,27 +14,29 @@ use Molitor\Unas\Services\UnasService;
 
 class UnasProductApiDtoService extends UnasService
 {
-    public function getProductDtoByRemoteId(UnasShop $shop, int $remoteId): ProductDto|null
+    public function getProductDtoByRemoteId(UnasShop $shop, int $remoteId): ?ProductDto
     {
         $endpoint = $this->makeGetProductEndpoint($shop->api_key);
         $endpoint->setIdRequestData($remoteId);
         $endpoint->execute();
         $products = $endpoint->getResultProducts();
-        if (!count($products)) {
+        if (! count($products)) {
             return null;
         }
+
         return $this->makeProductDto($products[0]);
     }
 
-    public function getProductDtoBySku(UnasShop $shop, string $sku): ProductDto|null
+    public function getProductDtoBySku(UnasShop $shop, string $sku): ?ProductDto
     {
         $endpoint = $this->makeGetProductEndpoint($shop->api_key);
         $endpoint->setSkuRequestData($sku);
         $endpoint->execute();
         $products = $endpoint->getResultProducts();
-        if (!count($products)) {
+        if (! count($products)) {
             return null;
         }
+
         return $this->makeProductDto($products[0]);
     }
 
@@ -54,7 +56,7 @@ class UnasProductApiDtoService extends UnasService
             $endpoint->execute();
             foreach ($endpoint->getResultProducts() as $resultProduct) {
                 $productDto = $this->makeProductDto($resultProduct);
-                $product((int)$resultProduct['Id'], $productDto);
+                $product((int) $resultProduct['Id'], $productDto);
             }
         }
 
@@ -67,8 +69,8 @@ class UnasProductApiDtoService extends UnasService
 
         $name = $result['Name'] ?? null;
 
-        $productDto = new ProductDto();
-        $productDto->id = (int)$result['Id'];
+        $productDto = new ProductDto;
+        $productDto->id = (int) $result['Id'];
         $productDto->source = 'unas_api';
         $productDto->active = ($result['State'] == 'live');
         $productDto->sku = $result['Sku'];
@@ -82,18 +84,16 @@ class UnasProductApiDtoService extends UnasService
         $productDto->price = $this->getPriceByProduct($result);
         $productDto->stock = $result['Stocks']['Stock']['Qty'] ?? null;
 
-        foreach($this->getResultImagesByProduct($result) as $image)
-        {
-            $imageDto = new ImageDto();
+        foreach ($this->getResultImagesByProduct($result) as $image) {
+            $imageDto = new ImageDto;
             $imageDto->url = $image['SefUrl'];
             $imageDto->alt->set($defaultLanguage, $image['Alt'] ?? null);
             $imageDto->title->set($defaultLanguage, $name);
             $productDto->addImage($imageDto);
         }
 
-        foreach ($this->getResultCategoriesByProduct($result) as $category)
-        {
-            $productCategoryDto = new ProductCategoryDto();
+        foreach ($this->getResultCategoriesByProduct($result) as $category) {
+            $productCategoryDto = new ProductCategoryDto;
             $productCategoryDto->id = $category['Id'];
             $productCategoryDto->path->separator = '|';
             $productCategoryDto->path->setPath($defaultLanguage, $category['Name'] ?? null);
@@ -102,13 +102,12 @@ class UnasProductApiDtoService extends UnasService
         }
 
         $sort = 0;
-        foreach ($this->getResultParametersByProduct($result) as $parameter)
-        {
-            if($parameter['Name'] && $parameter['Value']) {
-                $productFieldDto = new ProductFieldDto();
+        foreach ($this->getResultParametersByProduct($result) as $parameter) {
+            if ($parameter['Name'] && $parameter['Value']) {
+                $productFieldDto = new ProductFieldDto;
                 $productFieldDto->name->set($defaultLanguage, $parameter['Name']);
 
-                $productFieldOptionDto = new ProductFieldOptionDto();
+                $productFieldOptionDto = new ProductFieldOptionDto;
                 $productFieldOptionDto->name->set($defaultLanguage, $parameter['Value']);
 
                 $attribute = new ProductAttributeDto($productFieldDto, $productFieldOptionDto);
@@ -130,6 +129,7 @@ class UnasProductApiDtoService extends UnasService
                 return [$resultProduct['Categories']['Category']];
             }
         }
+
         return [];
     }
 
@@ -142,6 +142,7 @@ class UnasProductApiDtoService extends UnasService
                 return [$resultProduct['Params']['Param']];
             }
         }
+
         return [];
     }
 
@@ -149,15 +150,16 @@ class UnasProductApiDtoService extends UnasService
     {
         if (isset($resultProduct['Prices'])) {
             if (isset($resultProduct['Prices']['Price']['Net'])) {
-                return (float)$resultProduct['Prices']['Price']['Net'];
+                return (float) $resultProduct['Prices']['Price']['Net'];
             } else {
                 foreach ($resultProduct['Prices']['Price'] as $price) {
                     if ($price['Type'] === 'normal') {
-                        return (float)$price['Net'];
+                        return (float) $price['Net'];
                     }
                 }
             }
         }
+
         return null;
     }
 
@@ -170,6 +172,7 @@ class UnasProductApiDtoService extends UnasService
                 return [$resultProduct['Images']['Image']];
             }
         }
+
         return [];
     }
 }

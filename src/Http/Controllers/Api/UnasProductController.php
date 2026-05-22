@@ -23,7 +23,7 @@ class UnasProductController
         }
 
         if ($search = $request->string('search')->toString()) {
-            $query->where('sku', 'like', '%' . $search . '%');
+            $query->where('sku', 'like', '%'.$search.'%');
         }
 
         $allowedSortFields = ['id', 'sku', 'price', 'stock', 'created_at'];

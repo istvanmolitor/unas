@@ -3,9 +3,6 @@
 namespace Molitor\Unas\database\seeders;
 
 use Illuminate\Database\Seeder;
-use Molitor\Setting\Repositories\SettingGroupRepositoryInterface;
-use Molitor\Setting\Repositories\SettingRepositoryInterface;
-use Molitor\Unas\Models\UnasShop;
 use Molitor\User\Exceptions\PermissionException;
 use Molitor\User\Services\AclManagementService;
 

@@ -20,5 +20,3 @@ return [
     'download_action' => 'Letöltés',
     'download_job_dispatched' => 'A termékek letöltése elindult a háttérben.',
 ];
-
-

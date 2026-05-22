@@ -12,23 +12,21 @@ class UnasProductCategoryDtoService
 {
     public function __construct(
         protected UnasProductCategoryRepositoryInterface $unasProductCategoryRepository,
-    )
-    {
-    }
+    ) {}
 
     /**
      * Create DTO from UnasProductCategory model
      */
     public function makeDto(UnasProductCategory $category): ProductCategoryDto
     {
-        $dto = new ProductCategoryDto();
+        $dto = new ProductCategoryDto;
         $dto->id = $category->id;
         $dto->source = 'unas';
 
         // Build path from category hierarchy
         $pathCategories = $this->unasProductCategoryRepository->getPathCategories($category);
         foreach ($pathCategories as $pathCategory) {
-            $dto->path->addItem()->set('hu', (string)$pathCategory);
+            $dto->path->addItem()->set('hu', (string) $pathCategory);
         }
 
         // Set description
@@ -38,7 +36,7 @@ class UnasProductCategoryDtoService
 
         // Set image if available
         if ($category->image_url) {
-            $imageDto = new ImageDto();
+            $imageDto = new ImageDto;
             $imageDto->url = $category->image_url;
             $dto->image = $imageDto;
         }
@@ -51,6 +49,7 @@ class UnasProductCategoryDtoService
         $category = $this->makeModel($shop, $dto);
         $this->fillModel($category, $dto);
         $category->save();
+
         return $category;
     }
 
@@ -60,6 +59,7 @@ class UnasProductCategoryDtoService
     public function makeModel(UnasShop $shop, ProductCategoryDto $dto): ?UnasProductCategory
     {
         $path = $dto->path->getArrayPath('hu');
+
         return $this->getOrCreateByPath($shop, $path);
     }
 
@@ -100,18 +100,18 @@ class UnasProductCategoryDtoService
                 if ($existing) {
                     $parent = $existing;
                 } else {
-                    $parent = $this->unasProductCategoryRepository->createRootCategory($shop, (string)$name);
+                    $parent = $this->unasProductCategoryRepository->createRootCategory($shop, (string) $name);
                 }
             } else {
                 $existing = $this->unasProductCategoryRepository->getSubCategoryByName($parent, $name);
                 if ($existing) {
                     $parent = $existing;
                 } else {
-                    $parent = $this->unasProductCategoryRepository->createSubCategory($parent, (string)$name);
+                    $parent = $this->unasProductCategoryRepository->createSubCategory($parent, (string) $name);
                 }
             }
 
-            if (!$parent) {
+            if (! $parent) {
                 return null;
             }
         }
@@ -119,4 +119,3 @@ class UnasProductCategoryDtoService
         return $parent;
     }
 }
-

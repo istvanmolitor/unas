@@ -63,6 +63,7 @@ class UnasSync extends Command
             $productCategoryService->syncChanges($shop);
             $productRepository->syncChanges($shop);
         }
+
         return 0;
     }
 }

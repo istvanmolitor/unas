@@ -19,8 +19,7 @@ class DownloadUnasProductsJob implements ShouldQueue
      */
     public function __construct(
         public UnasShop $shop
-    ) {
-    }
+    ) {}
 
     /**
      * Execute the job.
@@ -30,4 +29,3 @@ class DownloadUnasProductsJob implements ShouldQueue
         $unasProductService->downloadProducts($this->shop);
     }
 }
-

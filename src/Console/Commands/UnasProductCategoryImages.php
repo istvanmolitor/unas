@@ -2,8 +2,8 @@
 
 namespace Molitor\Unas\Console\Commands;
 
-use Molitor\Unas\Repositories\UnasProductCategoryRepository;
 use Illuminate\Console\Command;
+use Molitor\Unas\Repositories\UnasProductCategoryRepository;
 
 class UnasProductCategoryImages extends Command
 {
@@ -38,7 +38,7 @@ class UnasProductCategoryImages extends Command
      */
     public function handle()
     {
-        $repository = new UnasProductCategoryRepository();
+        $repository = new UnasProductCategoryRepository;
 
         $shops = UnasShop::where('enabled', 1)->get();
         foreach ($shops as $shop) {

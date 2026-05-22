@@ -32,6 +32,7 @@ class GetCategoryEndpoint extends Endpoint
                 return [$this->result['Category']];
             }
         }
+
         return [];
     }
 }

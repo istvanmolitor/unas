@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Models;
 
-use Molitor\Product\Models\ProductField;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Molitor\Language\Models\Language;
+use Molitor\Product\Models\ProductField;
 
 class UnasProductParameter extends Model
 {
     use SoftDeletes;
-
 
     protected $fillable = [
         'type',
@@ -38,6 +38,6 @@ class UnasProductParameter extends Model
 
     public function language()
     {
-        return $this->belongsTo(\Molitor\Language\Models\Language::class, 'language_id');
+        return $this->belongsTo(Language::class, 'language_id');
     }
 }

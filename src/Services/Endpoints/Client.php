@@ -9,12 +9,17 @@ use SimpleXMLElement;
 class Client
 {
     protected string $endpoint;
+
     protected string $rootTag;
+
     protected array $requestData = [];
+
     protected array $header = [];
 
     protected bool $executed = false;
+
     protected ?array $result = null;
+
     protected ?string $error = null;
 
     public function __construct(string $endpoint, string $rootTag)
@@ -26,12 +31,14 @@ class Client
     public function setHeader(array $header): self
     {
         $this->header = $header;
+
         return $this;
     }
 
     public function setRequestData(array $requestData): self
     {
         $this->requestData = $requestData;
+
         return $this;
     }
 
@@ -46,12 +53,12 @@ class Client
             } else {
                 if (is_array($value)) {
                     if (is_numeric($key)) {
-                        $key = 'item' . $key; //dealing with <0/>..<n/> issues
+                        $key = 'item'.$key; // dealing with <0/>..<n/> issues
                     }
                     $subnode = $xmlData->addChild($key);
                     $this->buildXml($value, $subnode);
                 } else {
-                    $xmlData->addChild((string)$key, htmlspecialchars((string)$value));
+                    $xmlData->addChild((string) $key, htmlspecialchars((string) $value));
                 }
             }
         }
@@ -59,14 +66,15 @@ class Client
 
     public function getRequestXml(): string
     {
-        $xmlData = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><' . $this->rootTag . '/>');
+        $xmlData = new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><'.$this->rootTag.'/>');
         $this->buildXml($this->requestData, $xmlData);
-        return (string)$xmlData->asXML();
+
+        return (string) $xmlData->asXML();
     }
 
     public function getUrl(): string
     {
-        return 'https://api.unas.eu/' . $this->endpoint;
+        return 'https://api.unas.eu/'.$this->endpoint;
     }
 
     public function execute(): void
@@ -109,6 +117,7 @@ class Client
                 return null;
             }
         }
+
         return $data;
     }
 
@@ -117,12 +126,12 @@ class Client
         return $this;
     }
 
-    public function getResult(): array|null
+    public function getResult(): ?array
     {
         return $this->result;
     }
 
-    public function getError(): string|null
+    public function getError(): ?string
     {
         return $this->error;
     }

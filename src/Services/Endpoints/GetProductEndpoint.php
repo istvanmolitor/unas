@@ -6,7 +6,6 @@ namespace Molitor\Unas\Services\Endpoints;
 
 class GetProductEndpoint extends Endpoint
 {
-
     protected function getEndpoint(): string
     {
         return 'shop/getProduct';
@@ -42,6 +41,7 @@ class GetProductEndpoint extends Endpoint
                 return [$this->result['Product']];
             }
         }
+
         return [];
     }
 }

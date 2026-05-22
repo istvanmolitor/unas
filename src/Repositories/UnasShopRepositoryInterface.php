@@ -2,8 +2,8 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasShop;
 use Illuminate\Database\Eloquent\Collection;
+use Molitor\Unas\Models\UnasShop;
 
 interface UnasShopRepositoryInterface
 {
@@ -13,5 +13,5 @@ interface UnasShopRepositoryInterface
 
     public function delete(UnasShop $shop): void;
 
-    public function getById(int $shopId): UnasShop|null;
+    public function getById(int $shopId): ?UnasShop;
 }

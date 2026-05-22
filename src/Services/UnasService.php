@@ -15,17 +15,21 @@ use Molitor\Unas\Services\Endpoints\SetProductParameterEndpoint;
 class UnasService
 {
     const STATUS_OK = 'ok';
+
     const ACTION_UPDATE = 'modify';
+
     const ACTION_CREATE = 'add';
+
     const ACTION_DELETE = 'delete';
 
     private static array $auths = [];
 
     public function getAuth(string $apiKey): Auth
     {
-        if (!array_key_exists($apiKey, self::$auths)) {
+        if (! array_key_exists($apiKey, self::$auths)) {
             self::$auths[$apiKey] = new Auth($apiKey);
         }
+
         return self::$auths[$apiKey];
     }
 

@@ -2,12 +2,12 @@
 
 namespace Molitor\Unas\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
 use Molitor\Product\Models\Product;
 use Molitor\Product\Models\ProductUnit;
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductCategory;
-use Illuminate\Database\Eloquent\Collection;
+use Molitor\Unas\Models\UnasShop;
 
 interface UnasProductRepositoryInterface
 {
@@ -20,18 +20,18 @@ interface UnasProductRepositoryInterface
     public function findByRemoteId(UnasShop $unasShop, ?int $remoteId): ?UnasProduct;
 
     public function createProduct(
-        UnasShop    $shop,
-        int         $remoteId,
-        string      $sku,
-        string      $name,
-        ?string     $description,
-        ?float      $price,
+        UnasShop $shop,
+        int $remoteId,
+        string $sku,
+        string $name,
+        ?string $description,
+        ?float $price,
         ProductUnit $productUnit
     ): UnasProduct;
 
     public function addShopProduct(UnasProduct $shopProduct, UnasProductCategory $shopProductCategory): UnasProduct;
 
-    public function getBySku(UnasShop $unasShop, string $sku): UnasProduct|null;
+    public function getBySku(UnasShop $unasShop, string $sku): ?UnasProduct;
 
     public function update(UnasProduct $product): void;
 

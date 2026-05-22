@@ -21,23 +21,20 @@ class UnasProductService extends UnasService
     public function __construct(
         private UnasProductCategoryService $unasProductCategoryService,
         private UnasProductRepositoryInterface $unasProductRepository,
-        private UnasProductCategoryRepositoryInterface  $unasProductCategoryRepository,
+        private UnasProductCategoryRepositoryInterface $unasProductCategoryRepository,
         private UnasProductImageRepositoryInterface $unasProductImageRepository,
         private ProductUnitRepositoryInterface $productUnitRepository,
 
         private UnasProductApiDtoService $unasProductApiDtoService,
         private UnasProductDtoService $unasProductDtoService,
         private ProductDtoService $productDtoService,
-    )
-    {
-    }
+    ) {}
 
     public function syncOneUnasProduct(UnasProduct $unasProduct): void
     {
-        if($unasProduct->remote_id) {
+        if ($unasProduct->remote_id) {
             $productDto = $this->unasProductApiDtoService->getProductDtoByRemoteId($unasProduct->shop, $unasProduct->remote_id);
-        }
-        else {
+        } else {
             $productDto = $this->unasProductApiDtoService->getProductDtoBySku($unasProduct->shop, $unasProduct->sku);
         }
 
@@ -50,6 +47,7 @@ class UnasProductService extends UnasService
         $product = $this->productDtoService->saveDto($productDto);
         $unasProduct->product_id = $product->id;
         $unasProduct->save();
+
         return $product;
     }
 
@@ -64,21 +62,22 @@ class UnasProductService extends UnasService
         $products->each(function ($record) {
             $this->copyToProduct($record);
         });
+
         return $products->count();
     }
 
-    private function findExistedProduct(UnasShop $unasShop, int $remoteId, ProductDto $productDto): UnasProduct|null
+    private function findExistedProduct(UnasShop $unasShop, int $remoteId, ProductDto $productDto): ?UnasProduct
     {
-        if($remoteId) {
+        if ($remoteId) {
             $unasProduct = $this->unasProductRepository->findByRemoteId($unasShop, $remoteId);
             if ($unasProduct) {
                 return $unasProduct;
             }
         }
 
-        if($productDto->sku) {
+        if ($productDto->sku) {
             $unasProduct = $this->unasProductRepository->getBySku($unasShop, $productDto->sku);
-            if ($unasProduct && !$unasProduct->remote_id) {
+            if ($unasProduct && ! $unasProduct->remote_id) {
                 return $unasProduct;
             }
         }
@@ -106,7 +105,7 @@ class UnasProductService extends UnasService
             foreach ($endpoint->getResultProducts() as $resultProduct) {
                 $product = $this->unasProductRepository->createProduct(
                     $shop,
-                    (int)$resultProduct['Id'],
+                    (int) $resultProduct['Id'],
                     $resultProduct['Sku'],
                     $resultProduct['Name'],
                     $resultProduct['Description']['Long'] ?? null,
@@ -121,9 +120,9 @@ class UnasProductService extends UnasService
                     if (isset($resultCategory['Name'])) {
                         $shopCategory = $this->unasProductCategoryRepository->findByRemoteId(
                             $shop,
-                            (int)$resultCategory['Id']
+                            (int) $resultCategory['Id']
                         );
-                        if (!$shopCategory) {
+                        if (! $shopCategory) {
                             $path = explode('|', $resultCategory['Name']);
                             $shopCategory = $this->unasProductCategoryService->createByPath($shop, $path);
                         }
@@ -135,8 +134,8 @@ class UnasProductService extends UnasService
 
                 $images = $endpoint->getResultImagesByProduct($resultProduct);
                 foreach ($images as $image) {
-                    $this->unasProductImageRepository->addUrl($product, $image['SefUrl'], $image['Alt']);;
-                };
+                    $this->unasProductImageRepository->addUrl($product, $image['SefUrl'], $image['Alt']);
+                }
             }
         }
 
@@ -145,18 +144,13 @@ class UnasProductService extends UnasService
 
     /**
      * Visszaadja az UNAS termékek számát amik még nem szerepelnek a saját törzsünkben
-     * @param UnasShop $shop
-     * @return int
      */
     public function getCountForeignByShop(UnasShop $shop): int
     {
         return $shop->shopProducts()->whereNull('product_id')->count();
     }
 
-    public function clearShop(UnasShop $shop): void
-    {
-
-    }
+    public function clearShop(UnasShop $shop): void {}
 
     public function updateByCategory(UnasProductCategory $category): void
     {
@@ -192,13 +186,14 @@ class UnasProductService extends UnasService
                 $this->unasProductRepository->forceDeleteByRemoteId($resultProduct['Id']);
             }
         }
+
         return $i;
     }
 
     private function getParameters(UnasProduct $shopProduct): array
     {
         return [];
-        $sql = "
+        $sql = '
         SELECT spp.remote_id AS id, pfo.name AS value
         FROM products p
         INNER JOIN unas_products sp ON sp.product_id = p.id
@@ -207,7 +202,7 @@ class UnasProductService extends UnasService
         INNER JOIN product_fields pf ON pf.id = pfo.product_field_id
         INNER JOIN unas_product_parameters spp ON spp.product_field_id = pf.id
         WHERE sp.id = ? AND sp.remote_id IS NOT NULL AND spp.remote_id IS NOT NULL
-        ";
+        ';
 
         $parameterValues = DB::select($sql, [$shopProduct->id]);
 
@@ -261,8 +256,8 @@ class UnasProductService extends UnasService
                         '@Price' => [
                             [
                                 'Type' => 'normal',
-                                'Net' => (int)$product->price,
-                                'Gross' => (int)($product->price * 1.27),
+                                'Net' => (int) $product->price,
+                                'Gross' => (int) ($product->price * 1.27),
                             ],
                         ],
                     ],
@@ -282,14 +277,13 @@ class UnasProductService extends UnasService
                         'Type' => ($i ? 'alt' : 'base'),
                         'SefUrl' => basename($productImage->url),
                         'Import' => [
-                            'Url' => $productImage->url
+                            'Url' => $productImage->url,
                         ],
                     ];
                 }
                 if (count($images)) {
                     $requestProduct['Images']['@Image'] = $images;
                 }
-
 
                 $parameters = $this->getParameters($product);
                 if (count($parameters)) {
@@ -300,7 +294,7 @@ class UnasProductService extends UnasService
             }
         }
 
-        if (!count($validShopProducts)) {
+        if (! count($validShopProducts)) {
             return 0;
         }
 
@@ -316,7 +310,7 @@ class UnasProductService extends UnasService
 
         $i = 0;
         foreach ($validShopProducts as $i => $shopProduct) {
-            if (!isset($resultProducts[$i])) {
+            if (! isset($resultProducts[$i])) {
                 return $i;
             }
             $resultProduct = $resultProducts[$i];
@@ -331,6 +325,7 @@ class UnasProductService extends UnasService
                 return $i;
             }
         }
+
         return $i;
     }
 

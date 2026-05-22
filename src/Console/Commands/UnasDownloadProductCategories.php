@@ -50,7 +50,7 @@ class UnasDownloadProductCategories extends Command
             $this->info("Downloading product categories for UNAS shop: {$shop->name}");
             $unasProductCategoryService->repairCategories($shop);
         }
+
         return 0;
     }
 }
-

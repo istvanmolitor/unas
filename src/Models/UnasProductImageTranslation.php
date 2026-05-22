@@ -26,4 +26,3 @@ class UnasProductImageTranslation extends TranslationModel
         ];
     }
 }
-

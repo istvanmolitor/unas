@@ -3,18 +3,16 @@
 namespace Molitor\Unas\Services;
 
 use Molitor\Language\Repositories\LanguageRepositoryInterface;
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProductParameter;
+use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductParameterRepositoryInterface;
 
 class UnasProductParameterService extends UnasService
 {
     public function __construct(
         private UnasProductParameterRepositoryInterface $unasProductParameterRepository,
-        private LanguageRepositoryInterface             $languageRepository
-    )
-    {
-    }
+        private LanguageRepositoryInterface $languageRepository
+    ) {}
 
     public function repairParameters(UnasShop $shop): void
     {
@@ -22,10 +20,10 @@ class UnasProductParameterService extends UnasService
         $this->downloadParameters($shop);
     }
 
-    public function getByResult(UnasShop $shop, array $resultProductParameter): UnasProductParameter|null
+    public function getByResult(UnasShop $shop, array $resultProductParameter): ?UnasProductParameter
     {
-        $paremeter = $this->unasProductParameterRepository->getByRemoteId($shop, (int)$resultProductParameter['Id']);
-        if($paremeter) {
+        $paremeter = $this->unasProductParameterRepository->getByRemoteId($shop, (int) $resultProductParameter['Id']);
+        if ($paremeter) {
             return $paremeter;
         }
 
@@ -36,10 +34,11 @@ class UnasProductParameterService extends UnasService
             $language
         );
         if ($paremeter) {
-            if($paremeter->remote_id === null) {
-                $paremeter->remote_id = (int)$resultProductParameter['Id'];
+            if ($paremeter->remote_id === null) {
+                $paremeter->remote_id = (int) $resultProductParameter['Id'];
                 $paremeter->save();
             }
+
             return $paremeter;
         }
 
@@ -49,8 +48,8 @@ class UnasProductParameterService extends UnasService
                 'name' => $resultProductParameter['Name'],
                 'type' => $resultProductParameter['Type'],
                 'language_id' => $language->id,
-                'order' => (int)$resultProductParameter['Order'],
-                'remote_id' => (int)$resultProductParameter['Id'],
+                'order' => (int) $resultProductParameter['Order'],
+                'remote_id' => (int) $resultProductParameter['Id'],
             ]
         );
     }
@@ -64,14 +63,12 @@ class UnasProductParameterService extends UnasService
             $parameter = $this->getByResult($shop, $resultProductParameter);
             $parameter->name = $resultProductParameter['Name'];
             $parameter->type = $resultProductParameter['Type'];
-            $parameter->order = (int)$resultProductParameter['Order'];
+            $parameter->order = (int) $resultProductParameter['Order'];
             $parameter->save();
         }
     }
 
-    public function clearShop(UnasShop $shop): void
-    {
-    }
+    public function clearShop(UnasShop $shop): void {}
 
     public function syncChanges(UnasShop $shop): bool
     {
@@ -92,7 +89,7 @@ class UnasProductParameterService extends UnasService
             $requestProductParameter = [
                 'Name' => $shopProductParameter->productField->name,
                 'Display' => [
-                    'ProductDetails' => 'yes'
+                    'ProductDetails' => 'yes',
                 ],
             ];
 
@@ -114,7 +111,7 @@ class UnasProductParameterService extends UnasService
         $resultProductParameters = $endpoint->getResultProductParameters();
 
         foreach ($shopProductParameters as $i => $shopProductParameter) {
-            if (!isset($resultProductParameters[$i])) {
+            if (! isset($resultProductParameters[$i])) {
                 return false;
             }
             $resultProductParameter = $resultProductParameters[$i];
@@ -160,6 +157,7 @@ class UnasProductParameterService extends UnasService
                 $this->unasProductParameterRepository->forceDeleteByRemoteId($resultProductParameter['Id']);
             }
         }
+
         return $i;
     }
 }

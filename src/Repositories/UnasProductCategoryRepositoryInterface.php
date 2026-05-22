@@ -2,9 +2,9 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasShop;
-use Molitor\Unas\Models\UnasProductCategory;
 use Illuminate\Database\Eloquent\Collection;
+use Molitor\Unas\Models\UnasProductCategory;
+use Molitor\Unas\Models\UnasShop;
 
 interface UnasProductCategoryRepositoryInterface
 {

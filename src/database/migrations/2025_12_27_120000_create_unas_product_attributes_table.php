@@ -36,4 +36,3 @@ class CreateUnasProductAttributesTable extends Migration
         Schema::dropIfExists('unas_product_attributes');
     }
 }
-

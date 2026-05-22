@@ -2,22 +2,9 @@
 
 namespace Molitor\Unas\Console\Commands;
 
-use Molitor\Unas\Models\UnasShop;
-use Molitor\Unas\Models\UnasProduct;
-use Molitor\Unas\Models\UnasProductCategory;
-use Molitor\Unas\Models\UnasProductCategoryProduct;
-use Molitor\Unas\Models\UnasProductParameter;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
-use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepository;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepositoryInterface;
-use Molitor\Unas\Repositories\UnasProductCategoryRepository;
-use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
-use Molitor\Unas\Repositories\UnasProductParameterRepository;
-use Molitor\Unas\Repositories\UnasProductParameterRepositoryInterface;
-use Molitor\Unas\Repositories\UnasProductRepository;
-use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 use Molitor\Unas\Repositories\UnasShopRepository;
 use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
 use Molitor\Unas\Services\UnasProductCategoryService;
@@ -78,6 +65,7 @@ class UnasRepairCommand extends Command
             $parameterService->repairParameters($unasShop);
             $productService->repairProducts($unasShop);
         }
+
         return 0;
     }
 }

@@ -14,13 +14,11 @@ class UnasProductDtoService
     public function __construct(
         protected UnasProductRepositoryInterface $unasProductRepository,
         protected ProductUnitDtoService $productUnitDtoService,
-    )
-    {
-    }
+    ) {}
 
     public function makeDto(UnasProduct $unasProduct): ProductDto
     {
-        $productDto = new ProductDto();
+        $productDto = new ProductDto;
         $productDto->id = $unasProduct->id;
         $productDto->source = 'unas';
         $productDto->sku = $unasProduct->sku;
@@ -28,6 +26,7 @@ class UnasProductDtoService
         $productDto->name = $unasProduct->getAttributeDto('name');
         $productDto->price = $unasProduct->price;
         $productDto->currency = 'HUF';
+
         return $productDto;
     }
 
@@ -35,7 +34,7 @@ class UnasProductDtoService
     {
         $unasProduct = $this->makeModel($unasShop, $productDto);
 
-        if($productDto->source === 'unas_api' and $productDto->id) {
+        if ($productDto->source === 'unas_api' and $productDto->id) {
             $unasProduct->remote_id = $productDto->id;
         }
         $this->fillModel($unasProduct, $productDto);
@@ -53,12 +52,13 @@ class UnasProductDtoService
     public function makeModel(UnasShop $unasShop, ProductDto $productDto): UnasProduct
     {
         $unasProduct = $this->unasProductRepository->getBySku($unasShop, $productDto->sku);
-        if($unasProduct) {
+        if ($unasProduct) {
             return $unasProduct;
         }
-        $unasProduct = new UnasProduct();
+        $unasProduct = new UnasProduct;
         $unasProduct->unas_shop_id = $unasShop->id;
         $unasProduct->sku = $productDto->sku;
+
         return $unasProduct;
     }
 
@@ -79,17 +79,17 @@ class UnasProductDtoService
 
         $existingImages = $unasProduct->images()->get();
         $existingUrls = $existingImages->pluck('image_url')->toArray();
-        $dtoUrls = array_map(fn($image) => $image->url, $dtoImages);
+        $dtoUrls = array_map(fn ($image) => $image->url, $dtoImages);
 
         $urlsToDelete = array_diff($existingUrls, $dtoUrls);
-        if (!empty($urlsToDelete)) {
+        if (! empty($urlsToDelete)) {
             $unasProduct->images()->whereIn('image_url', $urlsToDelete)->delete();
         }
 
         foreach ($dtoImages as $index => $imageDto) {
             $unasProductImage = $existingImages->firstWhere('image_url', $imageDto->url);
-            if(!$unasProductImage) {
-                $unasProductImage = new UnasProductImage();
+            if (! $unasProductImage) {
+                $unasProductImage = new UnasProductImage;
                 $unasProductImage->unas_product_id = $unasProduct->id;
                 $unasProductImage->image_url = $imageDto->url;
             }
@@ -100,8 +100,5 @@ class UnasProductDtoService
         }
     }
 
-    protected function syncParameters(UnasProduct $unasProduct, ProductDto $productDto): void
-    {
-
-    }
+    protected function syncParameters(UnasProduct $unasProduct, ProductDto $productDto): void {}
 }

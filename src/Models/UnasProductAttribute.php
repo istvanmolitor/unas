@@ -28,4 +28,3 @@ class UnasProductAttribute extends Model
         return $this->belongsTo(ProductFieldOption::class, 'product_field_option_id');
     }
 }
-

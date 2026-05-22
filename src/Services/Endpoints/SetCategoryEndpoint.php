@@ -25,6 +25,7 @@ class SetCategoryEndpoint extends Endpoint
                 return [$this->result['Category']];
             }
         }
+
         return [];
     }
 }

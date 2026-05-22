@@ -25,6 +25,7 @@ class SetProductEndpoint extends Endpoint
                 return [$this->result['Product']];
             }
         }
+
         return [];
     }
 }

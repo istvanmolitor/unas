@@ -39,4 +39,3 @@ class CreateUnasProductImageTranslationsTable extends Migration
         Schema::dropIfExists('unas_product_image_translations');
     }
 }
-

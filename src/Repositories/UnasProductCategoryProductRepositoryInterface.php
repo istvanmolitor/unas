@@ -2,13 +2,13 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductCategory;
+use Molitor\Unas\Models\UnasShop;
 
 interface UnasProductCategoryProductRepositoryInterface
 {
-    public function exists(UnasProductCategory $productCategory, UnasProduct $product):bool;
+    public function exists(UnasProductCategory $productCategory, UnasProduct $product): bool;
 
     public function delete(UnasProductCategory $productCategory, UnasProduct $product): bool;
 

@@ -13,7 +13,7 @@ class Auth extends Client
         $this->apiKey = $apiKey;
         parent::__construct('shop/login', 'Params');
         $this->setRequestData([
-            'ApiKey' => $this->apiKey
+            'ApiKey' => $this->apiKey,
         ]);
     }
 

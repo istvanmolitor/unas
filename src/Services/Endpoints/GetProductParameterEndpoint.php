@@ -25,6 +25,7 @@ class GetProductParameterEndpoint extends Endpoint
                 return [$this->result['ProductParameter']];
             }
         }
+
         return [];
     }
 }

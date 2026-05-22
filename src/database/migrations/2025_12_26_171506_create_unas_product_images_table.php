@@ -23,7 +23,6 @@ class CreateUnasProductImagesTable extends Migration
             $table->boolean('is_main')->default(false);
             $table->integer('sort')->default(0);
 
-
             $table->timestamps();
         });
     }

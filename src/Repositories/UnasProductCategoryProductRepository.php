@@ -2,10 +2,10 @@
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasProductCategoryProduct;
+use Molitor\Unas\Models\UnasShop;
 
 class UnasProductCategoryProductRepository implements UnasProductCategoryProductRepositoryInterface
 {
@@ -13,10 +13,10 @@ class UnasProductCategoryProductRepository implements UnasProductCategoryProduct
 
     public function __construct()
     {
-        $this->unasProductCategoryProduct = new UnasProductCategoryProduct();
+        $this->unasProductCategoryProduct = new UnasProductCategoryProduct;
     }
 
-    public function exists(UnasProductCategory $productCategory, UnasProduct $product):bool
+    public function exists(UnasProductCategory $productCategory, UnasProduct $product): bool
     {
         return $this->unasProductCategoryProduct
             ->where('unas_product_category_id', $productCategory->id)
@@ -27,20 +27,20 @@ class UnasProductCategoryProductRepository implements UnasProductCategoryProduct
     public function delete(UnasProductCategory $productCategory, UnasProduct $product): bool
     {
         return $this->unasProductCategoryProduct
-                ->where('unas_product_category_id', $productCategory->id)
-                ->where('unas_product_id', $product->id)
-                ->delete() > 0;
+            ->where('unas_product_category_id', $productCategory->id)
+            ->where('unas_product_id', $product->id)
+            ->delete() > 0;
     }
 
     public function setValue(UnasProductCategory $productCategory, UnasProduct $product, $value): bool
     {
         if ($value) {
             return $this->unasProductCategoryProduct->firstOrCreate(
-                        [
-                            'unas_product_category_id' => $productCategory->id,
-                            'unas_product_id' => $product->id,
-                        ]
-                    ) instanceof UnasProductCategoryProduct;
+                [
+                    'unas_product_category_id' => $productCategory->id,
+                    'unas_product_id' => $product->id,
+                ]
+            ) instanceof UnasProductCategoryProduct;
         } else {
             return $this->delete($productCategory, $product);
         }

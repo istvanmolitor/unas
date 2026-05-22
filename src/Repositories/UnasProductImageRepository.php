@@ -2,9 +2,9 @@
 
 namespace Molitor\Unas\Repositories;
 
+use Illuminate\Database\Eloquent\Collection;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductImage;
-use Illuminate\Database\Eloquent\Collection;
 
 class UnasProductImageRepository implements UnasProductImageRepositoryInterface
 {
@@ -12,7 +12,7 @@ class UnasProductImageRepository implements UnasProductImageRepositoryInterface
 
     public function __construct()
     {
-        $this->productImage = new UnasProductImage();
+        $this->productImage = new UnasProductImage;
     }
 
     public function getByProduct(UnasProduct $product): Collection
@@ -25,7 +25,8 @@ class UnasProductImageRepository implements UnasProductImageRepositoryInterface
         return $this->productImage->where('unas_product_id', $product->id)->max('sort') + 1;
     }
 
-    public function addUrl(UnasProduct $product, string $url, string $alt): UnasProductImage {
+    public function addUrl(UnasProduct $product, string $url, string $alt): UnasProductImage
+    {
         return $this->productImage->create([
             'unas_product_id' => $product->id,
             'url' => $url,

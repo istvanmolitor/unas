@@ -7,9 +7,9 @@ namespace Molitor\Unas\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Molitor\Language\Models\TranslatableModel;
 use Molitor\Product\Models\Product;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Molitor\Product\Models\ProductUnit;
 
 class UnasProduct extends TranslatableModel
@@ -35,7 +35,7 @@ class UnasProduct extends TranslatableModel
 
     public function __toString(): string
     {
-        return (string) $this->sku . ' - ' . $this->name;
+        return (string) $this->sku.' - '.$this->name;
     }
 
     public function shop(): BelongsTo

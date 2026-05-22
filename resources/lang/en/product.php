@@ -20,4 +20,3 @@ return [
     'download_action' => 'Download',
     'download_job_dispatched' => 'Product download has been started in the background.',
 ];
-

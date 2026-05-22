@@ -50,7 +50,7 @@ class UnasDownloadProductParameters extends Command
             $this->info("Downloading product parameters for UNAS shop: {$shop->name}");
             $unasProductParameterService->downloadParameters($shop);
         }
+
         return 0;
     }
 }
-

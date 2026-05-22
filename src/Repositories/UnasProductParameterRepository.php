@@ -6,8 +6,8 @@ namespace Molitor\Unas\Repositories;
 
 use Molitor\Language\Models\Language;
 use Molitor\Product\Models\ProductField;
-use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Models\UnasProductParameter;
+use Molitor\Unas\Models\UnasShop;
 
 class UnasProductParameterRepository implements UnasProductParameterRepositoryInterface
 {
@@ -15,20 +15,20 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
 
     public function __construct()
     {
-        $this->shopProductParameter = new UnasProductParameter();
+        $this->shopProductParameter = new UnasProductParameter;
     }
 
     public function exists(UnasShop $shop, ProductField $productField): bool
     {
         return $this->shopProductParameter
-                ->where('unas_shop_id', $shop->id)
-                ->where('product_field_id', $productField->id)
-                ->count() > 0;
+            ->where('unas_shop_id', $shop->id)
+            ->where('product_field_id', $productField->id)
+            ->count() > 0;
     }
 
     public function addToShop(UnasShop $shop, ProductField $productField, $type = 'text'): bool
     {
-        if (!$this->exists($shop, $productField)) {
+        if (! $this->exists($shop, $productField)) {
             $this->shopProductParameter->create(
                 [
                     'unas_shop_id' => $shop->id,
@@ -37,8 +37,10 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
                     'changed' => 1,
                 ]
             );
+
             return true;
         }
+
         return false;
     }
 
@@ -74,8 +76,7 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
 
     public function deleteAll(UnasShop $shop): void
     {
-        foreach($shop->shopProductParameters()->get() as $shopProductParameter)
-        {
+        foreach ($shop->shopProductParameters()->get() as $shopProductParameter) {
             $shopProductParameter->delete();
         }
     }
@@ -102,14 +103,14 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
             ->forceDelete();
     }
 
-    public function getByRemoteId(UnasShop $shop, int $remoteId): UnasProductParameter|null
+    public function getByRemoteId(UnasShop $shop, int $remoteId): ?UnasProductParameter
     {
         return $this->shopProductParameter->where('unas_shop_id', $shop->id)
             ->where('remote_id', $remoteId)
             ->first();
     }
 
-    public function getByName(UnasShop $shop, string $name, Language $language): UnasProductParameter|null
+    public function getByName(UnasShop $shop, string $name, Language $language): ?UnasProductParameter
     {
         return $this->shopProductParameter->where('unas_shop_id', $shop->id)
             ->where('name', $name)

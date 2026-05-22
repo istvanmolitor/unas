@@ -76,4 +76,3 @@ return [
     'yes' => 'Yes',
     'no' => 'No',
 ];
-

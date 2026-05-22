@@ -2,7 +2,4 @@
 
 namespace Molitor\Unas\Repositories;
 
-class UnasOrderItemRepository
-{
-
-}
+class UnasOrderItemRepository {}

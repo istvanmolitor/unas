@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Services\Endpoints;
 
-use Molitor\Unas\Services\UnasService;
-
 class GetStockEndpoint extends Endpoint
 {
     protected function getEndpoint(): string
@@ -43,15 +41,17 @@ class GetStockEndpoint extends Endpoint
                 return [$this->result['Product']];
             }
         }
+
         return [];
     }
 
     public function getResultStock(): int
     {
         $products = $this->getResultProducts();
-        if(count($products)) {
-            return (int)$products[0]['Stocks']['Stock']['Qty'];
+        if (count($products)) {
+            return (int) $products[0]['Stocks']['Stock']['Qty'];
         }
+
         return 0;
     }
 }

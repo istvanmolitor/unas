@@ -2,39 +2,37 @@
 
 namespace Molitor\Unas\Services;
 
-use Molitor\Customer\Models\Customer;
 use Molitor\Product\Models\ProductCategory;
 use Molitor\Product\Repositories\ProductCategoryRepository;
-use Molitor\Tree\TreeBuilder;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
+use Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService;
 
 class UnasProductCategoryService extends UnasService
 {
     public function __construct(
-        private UnasProductCategoryRepositoryInterface        $unasProductCategoryRepository,
+        private UnasProductCategoryRepositoryInterface $unasProductCategoryRepository,
         private UnasProductCategoryProductRepositoryInterface $unasProductCategoryProductRepository,
-        private UnasProductRepositoryInterface                $unasProductRepository
-    )
-    {
-    }
+        private UnasProductRepositoryInterface $unasProductRepository
+    ) {}
 
     public function createByPath(UnasShop $shop, array $path): ?UnasProductCategory
     {
         $parent = null;
         foreach ($path as $name) {
             if ($parent === null) {
-                $parent = $this->unasProductCategoryRepository->createRootCategory($shop, (string)$name);
+                $parent = $this->unasProductCategoryRepository->createRootCategory($shop, (string) $name);
             } else {
-                $parent = $this->unasProductCategoryRepository->createSubCategory($parent, (string)$name);
+                $parent = $this->unasProductCategoryRepository->createSubCategory($parent, (string) $name);
             }
-            if (!$parent) {
+            if (! $parent) {
                 return null;
             }
         }
+
         return $parent;
     }
 
@@ -47,6 +45,7 @@ class UnasProductCategoryService extends UnasService
             return $this->unasProductCategoryRepository->getRootCategoryByName($shop, $path[0]);
         } else {
             $parent = $this->getByPath($shop, array_slice($path, 0, $count - 1));
+
             return $this->unasProductCategoryRepository->getSubCategoryByName($parent, $path[$count - 1]);
         }
     }
@@ -54,7 +53,7 @@ class UnasProductCategoryService extends UnasService
     public function repairCategories(UnasShop $shop): void
     {
         // Delegated to UnasProductCategoryApiDtoService
-        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        $apiService = app(UnasProductCategoryApiDtoService::class);
         $apiService->syncFromApi($shop);
     }
 
@@ -78,6 +77,7 @@ class UnasProductCategoryService extends UnasService
         if (count($shopCategory->shopProducts)) {
             return false;
         }
+
         return true;
     }
 
@@ -96,14 +96,16 @@ class UnasProductCategoryService extends UnasService
     public function syncDeletes(UnasShop $shop): int
     {
         // Delegated to UnasProductCategoryApiDtoService
-        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        $apiService = app(UnasProductCategoryApiDtoService::class);
+
         return $apiService->syncDeletes($shop);
     }
 
     public function syncChanges(UnasShop $shop): bool
     {
         // Delegated to UnasProductCategoryApiDtoService
-        $apiService = app(\Molitor\Unas\Services\Dto\Api\UnasProductCategoryApiDtoService::class);
+        $apiService = app(UnasProductCategoryApiDtoService::class);
+
         return $apiService->syncChanges($shop);
     }
 
@@ -111,21 +113,23 @@ class UnasProductCategoryService extends UnasService
     {
         $path = [];
         foreach ($this->unasProductCategoryRepository->getPathCategories($category) as $pathCategory) {
-            $path[] = (string)$pathCategory;
+            $path[] = (string) $pathCategory;
         }
+
         return $path;
     }
 
     public function copyProductCategory(ProductCategory $productCategory, UnasShop $shop): ?UnasProductCategory
     {
-        $productCategoryRepository = new ProductCategoryRepository();
+        $productCategoryRepository = new ProductCategoryRepository;
         $path = $productCategoryRepository->getPathCategories($productCategory);
+
         return $this->createShopCategory($shop, $path);
     }
 
     public function copyAllProductCategory(UnasShop $shop): void
     {
-        $productCategoryRepository = new ProductCategoryRepository();
+        $productCategoryRepository = new ProductCategoryRepository;
         /** @var ProductCategory $productCategory */
         foreach ($productCategoryRepository->getAll() as $productCategory) {
             $this->copyProductCategory($productCategory, $shop);
@@ -146,7 +150,5 @@ class UnasProductCategoryService extends UnasService
         $productCategory->save();
     }
 
-    private function createShopCategory(UnasShop $shop, array $path)
-    {
-    }
+    private function createShopCategory(UnasShop $shop, array $path) {}
 }

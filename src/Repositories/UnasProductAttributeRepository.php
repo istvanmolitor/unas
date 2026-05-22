@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Repositories;
 
-use Molitor\Unas\Models\UnasProduct;
-use Molitor\Unas\Models\UnasProductAttribute;
+use Illuminate\Database\Eloquent\Collection;
 use Molitor\Product\Models\ProductField;
 use Molitor\Product\Models\ProductFieldOption;
-use Molitor\Product\Repositories\ProductFieldRepositoryInterface;
 use Molitor\Product\Repositories\ProductFieldOptionRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Molitor\Product\Repositories\ProductFieldRepositoryInterface;
+use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Models\UnasProductAttribute;
 
 class UnasProductAttributeRepository implements UnasProductAttributeRepositoryInterface
 {
@@ -19,9 +19,8 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
     public function __construct(
         private ProductFieldRepositoryInterface $productFieldRepository,
         private ProductFieldOptionRepositoryInterface $productFieldOptionRepository
-    )
-    {
-        $this->unasProductAttribute = new UnasProductAttribute();
+    ) {
+        $this->unasProductAttribute = new UnasProductAttribute;
     }
 
     public function setAttribute(UnasProduct $unasProduct, string $name, array|string $value, int|string|null $language = null): self
@@ -37,6 +36,7 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
             $this->deleteAttributes($field)
                 ->add($unasProduct, $this->productFieldOptionRepository->create($field, $value, $language));
         }
+
         return $this;
     }
 
@@ -50,6 +50,7 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
         $this->unasProductAttribute
             ->where('unas_product_id', $unasProduct->id)
             ->delete();
+
         return true;
     }
 
@@ -66,9 +67,9 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
     protected function exists(UnasProduct $unasProduct, ProductFieldOption $productFieldOption): bool
     {
         return $this->unasProductAttribute
-                ->where('unas_product_id', $unasProduct->id)
-                ->where('product_field_option_id', $productFieldOption->id)
-                ->count() > 0;
+            ->where('unas_product_id', $unasProduct->id)
+            ->where('product_field_option_id', $productFieldOption->id)
+            ->count() > 0;
     }
 
     protected function deleteAttributes(ProductField $productField): self
@@ -88,7 +89,7 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
 
     private function add(UnasProduct $unasProduct, ProductFieldOption $productFieldOption): self
     {
-        if (!$this->exists($unasProduct, $productFieldOption)) {
+        if (! $this->exists($unasProduct, $productFieldOption)) {
             $this->unasProductAttribute->create(
                 [
                     'unas_product_id' => $unasProduct->id,
@@ -97,12 +98,13 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
                 ]
             );
         }
+
         return $this;
     }
 
     public function save(UnasProduct $unasProduct, ProductFieldOption $productFieldOption, int $sort): UnasProductAttribute
     {
-        if (!$this->exists($unasProduct, $productFieldOption)) {
+        if (! $this->exists($unasProduct, $productFieldOption)) {
             return $this->unasProductAttribute->create(
                 [
                     'unas_product_id' => $unasProduct->id,
@@ -110,8 +112,7 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
                     'sort' => $sort,
                 ]
             );
-        }
-        else {
+        } else {
             $attribute = $this->unasProductAttribute
                 ->where('unas_product_id', $unasProduct->id)
                 ->where('product_field_option_id', $productFieldOption->id)
@@ -123,4 +124,3 @@ class UnasProductAttributeRepository implements UnasProductAttributeRepositoryIn
         }
     }
 }
-

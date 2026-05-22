@@ -20,8 +20,8 @@ class UnasShopController
         $query = UnasShop::query()->with(['warehouse']);
 
         if ($search = $request->string('search')->toString()) {
-            $query->where('name', 'like', '%' . $search . '%')
-                ->orWhere('domain', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%'.$search.'%')
+                ->orWhere('domain', 'like', '%'.$search.'%');
         }
 
         $allowedSortFields = ['id', 'name', 'domain', 'enabled', 'created_at'];

@@ -2,20 +2,20 @@
 
 namespace Molitor\Unas\Services;
 
+use Molitor\Address\Repositories\AddressRepositoryInterface;
+use Molitor\Address\Repositories\CountryRepositoryInterface;
 use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
 use Molitor\Customer\Repositories\CustomerRepositoryInterface;
 use Molitor\Order\Models\Order;
-use Molitor\Order\Repositories\OrderRepositoryInterface;
-use Molitor\Order\Repositories\OrderStatusRepositoryInterface;
-use Molitor\Order\Repositories\OrderPaymentRepositoryInterface;
-use Molitor\Order\Repositories\OrderShippingRepositoryInterface;
-use Molitor\Unas\Models\UnasShop;
-use Molitor\Unas\Models\UnasOrder;
-use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
-use Molitor\Address\Repositories\AddressRepositoryInterface;
-use Molitor\Address\Repositories\CountryRepositoryInterface;
-use Molitor\Product\Repositories\ProductRepositoryInterface;
 use Molitor\Order\Models\OrderItem;
+use Molitor\Order\Repositories\OrderPaymentRepositoryInterface;
+use Molitor\Order\Repositories\OrderRepositoryInterface;
+use Molitor\Order\Repositories\OrderShippingRepositoryInterface;
+use Molitor\Order\Repositories\OrderStatusRepositoryInterface;
+use Molitor\Product\Repositories\ProductRepositoryInterface;
+use Molitor\Unas\Models\UnasOrder;
+use Molitor\Unas\Models\UnasShop;
+use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
 
 class UnasOrderService extends UnasService
 {
@@ -28,13 +28,11 @@ class UnasOrderService extends UnasService
         private ProductRepositoryInterface $productRepository,
         private OrderPaymentRepositoryInterface $orderPaymentRepository,
         private OrderShippingRepositoryInterface $orderShippingRepository
-    )
-    {
-    }
+    ) {}
 
     public function storeResultOrder(UnasShop $shop, array $resultOrder): UnasOrder
     {
-        $remoteId = (int)$resultOrder['Id'];
+        $remoteId = (int) $resultOrder['Id'];
 
         $unasOrder = $this->unasOrderRepository->getByRemoteId($remoteId);
         if ($unasOrder) {
@@ -42,11 +40,11 @@ class UnasOrderService extends UnasService
         }
 
         $mail = $resultOrder['Customer']['Email'] ?? null;
-        $internalName = $mail ?? ('unas-' . $remoteId);
+        $internalName = $mail ?? ('unas-'.$remoteId);
         $customer = $this->customerRepository->findOrCrate($internalName);
 
         $order = $this->orderRepository->create(
-            (string)$resultOrder['Key'],
+            (string) $resultOrder['Key'],
             $customer,
             $this->currencyRepository->getByCode($resultOrder['Currency']),
             $this->orderStatusRepository->fundOrCreate($resultOrder['Status'], $resultOrder['Status'])
@@ -62,30 +60,30 @@ class UnasOrderService extends UnasService
         $invoice = $addresses['Invoice'] ?? null;
         if ($invoice && $order->invoiceAddress) {
             $countryId = null;
-            if (!empty($invoice['CountryCode'])) {
-                $countryId = $countryRepository->findOrCreate(strtolower((string)$invoice['CountryCode']))->id;
+            if (! empty($invoice['CountryCode'])) {
+                $countryId = $countryRepository->findOrCreate(strtolower((string) $invoice['CountryCode']))->id;
             }
             $addressRepository->saveAddress($order->invoiceAddress, [
-                'name' => (string)($invoice['Name'] ?? ''),
+                'name' => (string) ($invoice['Name'] ?? ''),
                 'country_id' => $countryId,
-                'zip_code' => (string)($invoice['ZIP'] ?? ''),
-                'city' => (string)($invoice['City'] ?? ''),
-                'address' => (string)($invoice['Street'] ?? ''),
+                'zip_code' => (string) ($invoice['ZIP'] ?? ''),
+                'city' => (string) ($invoice['City'] ?? ''),
+                'address' => (string) ($invoice['Street'] ?? ''),
             ]);
         }
 
         $shipping = $addresses['Shipping'] ?? null;
         if ($shipping && $order->shippingAddress) {
             $countryId = null;
-            if (!empty($shipping['CountryCode'])) {
-                $countryId = $countryRepository->findOrCreate(strtolower((string)$shipping['CountryCode']))->id;
+            if (! empty($shipping['CountryCode'])) {
+                $countryId = $countryRepository->findOrCreate(strtolower((string) $shipping['CountryCode']))->id;
             }
             $addressRepository->saveAddress($order->shippingAddress, [
-                'name' => (string)($shipping['Name'] ?? ''),
+                'name' => (string) ($shipping['Name'] ?? ''),
                 'country_id' => $countryId,
-                'zip_code' => (string)($shipping['ZIP'] ?? ''),
-                'city' => (string)($shipping['City'] ?? ''),
-                'address' => (string)($shipping['Street'] ?? ''),
+                'zip_code' => (string) ($shipping['ZIP'] ?? ''),
+                'city' => (string) ($shipping['City'] ?? ''),
+                'address' => (string) ($shipping['Street'] ?? ''),
             ]);
         }
 
@@ -97,33 +95,55 @@ class UnasOrderService extends UnasService
         $shippingInfo = $resultOrder['Shipping'] ?? [];
         $invoiceInfo = $resultOrder['Invoice'] ?? [];
         $metaLines = [];
-        if (!empty($contact['Name'])) $metaLines[] = 'Customer: ' . $contact['Name'];
-        if (!empty($mail)) $metaLines[] = 'Email: ' . $mail;
-        if (!empty($contact['Phone'])) $metaLines[] = 'Phone: ' . $contact['Phone'];
-        if (!empty($resultOrder['Referer'])) $metaLines[] = 'Referer: ' . $resultOrder['Referer'];
-        if (!empty($payment)) $metaLines[] = 'Payment: ' . (($payment['Name'] ?? '') . (isset($payment['Type']) ? ' (' . $payment['Type'] . ')' : ''));
-        if (!empty($shippingInfo)) $metaLines[] = 'Shipping: ' . (($shippingInfo['Name'] ?? '') . (isset($shippingInfo['PackageNumber']) ? ' [' . $shippingInfo['PackageNumber'] . ']' : ''));
-        if (!empty($invoiceInfo)) $metaLines[] = 'Invoice: ' . (($invoiceInfo['Number'] ?? '') . (isset($invoiceInfo['Url']) ? ' ' . $invoiceInfo['Url'] : ''));
-        if (!empty($resultOrder['SumPriceGross'])) $metaLines[] = 'Total gross: ' . $resultOrder['SumPriceGross'] . ' ' . ($resultOrder['Currency'] ?? '');
-        if (!empty($resultOrder['Weight'])) $metaLines[] = 'Weight: ' . $resultOrder['Weight'] . ' kg';
-        if (!empty($resultOrder['Date'])) $metaLines[] = 'Order date: ' . $resultOrder['Date'];
-        if (!empty($resultOrder['DateMod'])) $metaLines[] = 'Modified: ' . $resultOrder['DateMod'];
+        if (! empty($contact['Name'])) {
+            $metaLines[] = 'Customer: '.$contact['Name'];
+        }
+        if (! empty($mail)) {
+            $metaLines[] = 'Email: '.$mail;
+        }
+        if (! empty($contact['Phone'])) {
+            $metaLines[] = 'Phone: '.$contact['Phone'];
+        }
+        if (! empty($resultOrder['Referer'])) {
+            $metaLines[] = 'Referer: '.$resultOrder['Referer'];
+        }
+        if (! empty($payment)) {
+            $metaLines[] = 'Payment: '.(($payment['Name'] ?? '').(isset($payment['Type']) ? ' ('.$payment['Type'].')' : ''));
+        }
+        if (! empty($shippingInfo)) {
+            $metaLines[] = 'Shipping: '.(($shippingInfo['Name'] ?? '').(isset($shippingInfo['PackageNumber']) ? ' ['.$shippingInfo['PackageNumber'].']' : ''));
+        }
+        if (! empty($invoiceInfo)) {
+            $metaLines[] = 'Invoice: '.(($invoiceInfo['Number'] ?? '').(isset($invoiceInfo['Url']) ? ' '.$invoiceInfo['Url'] : ''));
+        }
+        if (! empty($resultOrder['SumPriceGross'])) {
+            $metaLines[] = 'Total gross: '.$resultOrder['SumPriceGross'].' '.($resultOrder['Currency'] ?? '');
+        }
+        if (! empty($resultOrder['Weight'])) {
+            $metaLines[] = 'Weight: '.$resultOrder['Weight'].' kg';
+        }
+        if (! empty($resultOrder['Date'])) {
+            $metaLines[] = 'Order date: '.$resultOrder['Date'];
+        }
+        if (! empty($resultOrder['DateMod'])) {
+            $metaLines[] = 'Modified: '.$resultOrder['DateMod'];
+        }
 
         $order->comment = implode("\n", $metaLines);
-        $order->internal_comment = 'UNAS Status: ' . ($resultOrder['Status'] ?? '') . ' / ' . ($resultOrder['StatusType'] ?? '') . ' (Seen: ' . ($resultOrder['Seen'] ?? '') . ', Auth: ' . ($resultOrder['Authenticated'] ?? '') . ')';
+        $order->internal_comment = 'UNAS Status: '.($resultOrder['Status'] ?? '').' / '.($resultOrder['StatusType'] ?? '').' (Seen: '.($resultOrder['Seen'] ?? '').', Auth: '.($resultOrder['Authenticated'] ?? '').')';
 
         $order->phone = $contact['Phone'] ?? null;
         $order->referer = $resultOrder['Referer'] ?? null;
         $order->invoice = $invoiceInfo['Number'] ?? ($invoiceInfo['Url'] ?? null);
 
-        if (!empty($payment['Name'])) {
-            $paymentModel = $this->orderPaymentRepository->getByName((string)$payment['Name']);
+        if (! empty($payment['Name'])) {
+            $paymentModel = $this->orderPaymentRepository->getByName((string) $payment['Name']);
             if ($paymentModel) {
                 $order->order_payment_id = $paymentModel->id;
             }
         }
-        if (!empty($shippingInfo['Name'])) {
-            $shippingModel = $this->orderShippingRepository->getByName((string)$shippingInfo['Name']);
+        if (! empty($shippingInfo['Name'])) {
+            $shippingModel = $this->orderShippingRepository->getByName((string) $shippingInfo['Name']);
             if ($shippingModel) {
                 $order->order_shipping_id = $shippingModel->id;
             }
@@ -148,22 +168,23 @@ class UnasOrderService extends UnasService
         }
     }
 
-    public function downloadOrderByCode(UnasShop $shop, string $code): UnasOrder|null
+    public function downloadOrderByCode(UnasShop $shop, string $code): ?UnasOrder
     {
         $endpoint = $this->makeGetOrderEndpoint($shop->api_key);
         $endpoint->setKeyRequestData($code);
         $endpoint->execute();
 
         $resultOrder = $endpoint->getResultOrder();
+
         return $this->storeResultOrder($shop, $resultOrder);
     }
 
     public function getProductIdByItem(array $item): int
     {
-        $sku = (string)($item['Sku'] ?? '');
-        $name = (string)($item['Name'] ?? $sku ?: 'UNAS item');
+        $sku = (string) ($item['Sku'] ?? '');
+        $name = (string) ($item['Name'] ?? $sku ?: 'UNAS item');
         if ($sku === '') {
-            $sku = 'unas-' . ($item['Id'] ?? uniqid());
+            $sku = 'unas-'.($item['Id'] ?? uniqid());
         }
 
         return $this->productRepository->findOrCreate($sku, $name)->id;
@@ -173,11 +194,11 @@ class UnasOrderService extends UnasService
     {
         if (is_array($items)) {
             foreach ($items as $item) {
-                $orderItem = new OrderItem();
+                $orderItem = new OrderItem;
                 $orderItem->order_id = $order->id;
                 $orderItem->product_id = $this->getProductIdByItem($item);
-                $orderItem->quantity = (int)($item['Quantity'] ?? 1);
-                $orderItem->price = (float)($item['PriceGross'] ?? 0);
+                $orderItem->quantity = (int) ($item['Quantity'] ?? 1);
+                $orderItem->price = (float) ($item['PriceGross'] ?? 0);
                 $orderItem->comment = $item['Unit'] ?? null;
                 $orderItem->save();
             }

@@ -7,7 +7,9 @@ namespace Molitor\Unas\Services\Endpoints;
 abstract class Endpoint extends Client
 {
     const ACTION_UPDATE = 'modify';
+
     const ACTION_INSERT = 'add';
+
     const ACTION_DELETE = 'delete';
 
     private Auth $auth;
@@ -21,7 +23,7 @@ abstract class Endpoint extends Client
     public function getHeader(): array
     {
         return [
-            "Authorization: Bearer " . $this->auth->getToken()
+            'Authorization: Bearer '.$this->auth->getToken(),
         ];
     }
 
@@ -31,7 +33,7 @@ abstract class Endpoint extends Client
 
     public function execute(): void
     {
-        if (!$this->auth->isExecuted()) {
+        if (! $this->auth->isExecuted()) {
             $this->auth->execute();
         }
         $this->setHeader($this->getHeader());
@@ -39,8 +41,5 @@ abstract class Endpoint extends Client
         $this->processing();
     }
 
-    protected function processing(): void
-    {
-
-    }
+    protected function processing(): void {}
 }

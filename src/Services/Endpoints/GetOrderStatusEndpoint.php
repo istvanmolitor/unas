@@ -4,7 +4,6 @@ namespace Molitor\Unas\Services\Endpoints;
 
 class GetOrderStatusEndpoint extends Endpoint
 {
-
     protected function getEndpoint(): string
     {
         return 'shop/getOrderStatus';

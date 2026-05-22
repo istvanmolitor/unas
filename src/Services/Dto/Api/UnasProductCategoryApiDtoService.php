@@ -18,21 +18,20 @@ class UnasProductCategoryApiDtoService extends UnasService
     public function __construct(
         protected UnasProductCategoryRepositoryInterface $unasProductCategoryRepository,
         protected UnasProductCategoryDtoService $categoryDtoService,
-    )
-    {
-    }
+    ) {}
 
     private function getIdTreeBuilder(UnasShop $shop): TreeBuilder
     {
-        if(!array_key_exists($shop->id, $this->cache)) {
-            $this->cache[$shop->id] = new TreeBuilder();
+        if (! array_key_exists($shop->id, $this->cache)) {
+            $this->cache[$shop->id] = new TreeBuilder;
             $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
             $endpoint->execute();
 
             foreach ($endpoint->getResultCategories() as $resultCategory) {
-                $this->cache[$shop->id]->add((int)$resultCategory['Id'], $resultCategory, (int)$resultCategory['Parent']['Id']);
+                $this->cache[$shop->id]->add((int) $resultCategory['Id'], $resultCategory, (int) $resultCategory['Parent']['Id']);
             }
         }
+
         return $this->cache[$shop->id];
     }
 
@@ -52,12 +51,12 @@ class UnasProductCategoryApiDtoService extends UnasService
     {
         $builder = $this->getIdTreeBuilder($shop);
         $apiData = $builder->getData($id);
-        if($apiData === null) {
+        if ($apiData === null) {
             return null;
         }
 
-        $dto = new ProductCategoryDto();
-        $dto->id = (int)$apiData['Id'];
+        $dto = new ProductCategoryDto;
+        $dto->id = (int) $apiData['Id'];
         $dto->source = 'unas_api';
 
         $path = array_map(function ($item) {
@@ -70,14 +69,13 @@ class UnasProductCategoryApiDtoService extends UnasService
         }
 
         if (isset($apiData['Image']['Url'])) {
-            $imageDto = new ImageDto();
+            $imageDto = new ImageDto;
             $imageDto->url = $apiData['Image']['Url'];
             $dto->image = $imageDto;
         }
 
         return $dto;
     }
-
 
     /**
      * Sync categories from API response using DTOs
@@ -89,9 +87,9 @@ class UnasProductCategoryApiDtoService extends UnasService
         $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
         $endpoint->execute();
 
-        $treeBuilder = new CategoryTreeBuilder();
+        $treeBuilder = new CategoryTreeBuilder;
         foreach ($endpoint->getResultCategories() as $resultCategory) {
-            $treeBuilder->add((int)$resultCategory['Id'], (int)$resultCategory['Parent']['Id'], $resultCategory);
+            $treeBuilder->add((int) $resultCategory['Id'], (int) $resultCategory['Parent']['Id'], $resultCategory);
         }
 
         foreach ($treeBuilder->getChildrenIds(0) as $id) {
@@ -114,7 +112,7 @@ class UnasProductCategoryApiDtoService extends UnasService
             $category = $this->unasProductCategoryRepository->createSubCategory($parent, $item['Name']);
         }
 
-        if (!$category) {
+        if (! $category) {
             return;
         }
 
@@ -126,7 +124,7 @@ class UnasProductCategoryApiDtoService extends UnasService
         $category->keywords = $item['AutomaticMeta']['Keywords'] ?? '';
         $category->display_page = ($item['Display']['Page'] ?? 'no') === 'yes';
         $category->display_menu = ($item['Display']['Menu'] ?? 'no') === 'yes';
-        $category->remote_id = (int)$item['Id'];
+        $category->remote_id = (int) $item['Id'];
         $category->save();
 
         // Process children
