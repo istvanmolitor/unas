@@ -2,6 +2,7 @@
 
 namespace Molitor\Unas\Services;
 
+use RuntimeException;
 use Molitor\Address\Repositories\AddressRepositoryInterface;
 use Molitor\Address\Repositories\CountryRepositoryInterface;
 use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
@@ -42,12 +43,18 @@ class UnasOrderService extends UnasService
         $mail = $resultOrder['Customer']['Email'] ?? null;
         $internalName = $mail ?? ('unas-'.$remoteId);
         $customer = $this->customerRepository->findOrCrate($internalName);
+        $payment = $resultOrder['Payment'] ?? [];
+        $shippingInfo = $resultOrder['Shipping'] ?? [];
+        $orderPaymentId = $this->resolveOrderPaymentId($payment);
+        $orderShippingId = $this->resolveOrderShippingId($shippingInfo);
 
         $order = $this->orderRepository->create(
             (string) $resultOrder['Key'],
             $customer,
             $this->currencyRepository->getByCode($resultOrder['Currency']),
-            $this->orderStatusRepository->fundOrCreate($resultOrder['Status'], $resultOrder['Status'])
+            $this->orderStatusRepository->fundOrCreate($resultOrder['Status'], $resultOrder['Status']),
+            $orderPaymentId,
+            $orderShippingId
         );
 
         // Save invoice and shipping addresses if available
@@ -136,18 +143,6 @@ class UnasOrderService extends UnasService
         $order->referer = $resultOrder['Referer'] ?? null;
         $order->invoice = $invoiceInfo['Number'] ?? ($invoiceInfo['Url'] ?? null);
 
-        if (! empty($payment['Name'])) {
-            $paymentModel = $this->orderPaymentRepository->getByName((string) $payment['Name']);
-            if ($paymentModel) {
-                $order->order_payment_id = $paymentModel->id;
-            }
-        }
-        if (! empty($shippingInfo['Name'])) {
-            $shippingModel = $this->orderShippingRepository->getByName((string) $shippingInfo['Name']);
-            if ($shippingModel) {
-                $order->order_shipping_id = $shippingModel->id;
-            }
-        }
         $order->save();
 
         return UnasOrder::create([
@@ -192,16 +187,54 @@ class UnasOrderService extends UnasService
 
     protected function saveOrderItems(Order $order, array $items): void
     {
-        if (is_array($items)) {
-            foreach ($items as $item) {
-                $orderItem = new OrderItem;
-                $orderItem->order_id = $order->id;
-                $orderItem->product_id = $this->getProductIdByItem($item);
-                $orderItem->quantity = (int) ($item['Quantity'] ?? 1);
-                $orderItem->price = (float) ($item['PriceGross'] ?? 0);
-                $orderItem->comment = $item['Unit'] ?? null;
-                $orderItem->save();
+        $orderItems = array_is_list($items) ? $items : [$items];
+
+        foreach ($orderItems as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $orderItem = new OrderItem;
+            $orderItem->order_id = $order->id;
+            $orderItem->product_id = $this->getProductIdByItem($item);
+            $orderItem->quantity = (int) ($item['Quantity'] ?? 1);
+            $orderItem->price = (float) ($item['PriceGross'] ?? 0);
+            $orderItem->comment = $item['Unit'] ?? null;
+            $orderItem->save();
+        }
+    }
+
+    private function resolveOrderPaymentId(array $payment): int
+    {
+        if (! empty($payment['Name'])) {
+            $paymentModel = $this->orderPaymentRepository->getByName((string) $payment['Name']);
+            if ($paymentModel) {
+                return $paymentModel->id;
             }
         }
+
+        $paymentIds = $this->orderPaymentRepository->getAllIds();
+        if (! empty($paymentIds)) {
+            return (int) $paymentIds[0];
+        }
+
+        throw new RuntimeException('No order payment methods available for imported UNAS order.');
+    }
+
+    private function resolveOrderShippingId(array $shippingInfo): int
+    {
+        if (! empty($shippingInfo['Name'])) {
+            $shippingModel = $this->orderShippingRepository->getByName((string) $shippingInfo['Name']);
+            if ($shippingModel) {
+                return $shippingModel->id;
+            }
+        }
+
+        $shippingIds = $this->orderShippingRepository->getAllIds();
+        if (! empty($shippingIds)) {
+            return (int) $shippingIds[0];
+        }
+
+        throw new RuntimeException('No order shipping methods available for imported UNAS order.');
     }
 }

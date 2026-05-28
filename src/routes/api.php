@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use Molitor\Unas\Http\Controllers\Api\UnasOrderController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductCategoryController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductImageController;
@@ -27,5 +28,8 @@ Route::prefix('api/unas')->middleware(['api', 'auth:sanctum'])->group(function (
         ->only(['index', 'show', 'destroy']);
     Route::apiResource('parameters', UnasProductParameterController::class)
         ->parameters(['parameters' => 'unasProductParameter'])
+        ->only(['index', 'show', 'destroy']);
+    Route::apiResource('orders', UnasOrderController::class)
+        ->parameters(['orders' => 'unasOrder'])
         ->only(['index', 'show', 'destroy']);
 });
