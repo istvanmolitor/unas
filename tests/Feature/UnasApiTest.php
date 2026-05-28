@@ -7,9 +7,12 @@ namespace Tests\Feature;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
+use Molitor\Language\Models\Language;
 use Molitor\Product\Models\ProductUnit;
 use Molitor\Stock\Models\Warehouse;
 use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Models\UnasProductCategory;
+use Molitor\Unas\Models\UnasProductParameter;
 use Molitor\Unas\Models\UnasShop;
 use Tests\TestCase;
 
@@ -165,6 +168,70 @@ class UnasApiTest extends TestCase
             ->assertJsonPath('data.id', $product->id)
             ->assertJsonPath('data.sku', 'SKU-2')
             ->assertJsonPath('data.unas_shop_id', $shop->id);
+    }
+
+    public function test_can_show_unas_shop_with_related_counts(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $warehouse = Warehouse::query()->create([
+            'is_primary' => true,
+            'name' => 'Kozponti raktar',
+        ]);
+
+        $shop = UnasShop::query()->create([
+            'enabled' => true,
+            'domain' => 'test-shop.hu',
+            'name' => 'Test Shop',
+            'api_key' => 'secret-key',
+            'warehouse_id' => $warehouse->id,
+        ]);
+
+        $productUnit = ProductUnit::query()->create([
+            'enabled' => true,
+            'code' => 'db',
+        ]);
+
+        UnasProduct::query()->create([
+            'sku' => 'SKU-COUNT-1',
+            'unas_shop_id' => $shop->id,
+            'product_unit_id' => $productUnit->id,
+            'price' => 1000,
+            'stock' => 5,
+            'changed' => false,
+        ]);
+
+        UnasProductCategory::query()->create([
+            'unas_shop_id' => $shop->id,
+            'parent_id' => 0,
+            'name' => 'Kategoria 1',
+            'title' => 'Kategoria 1',
+            'display_page' => true,
+            'display_menu' => true,
+            'changed' => false,
+        ]);
+
+        $language = Language::query()->create([
+            'enabled' => true,
+            'code' => 'hu',
+        ]);
+
+        UnasProductParameter::query()->create([
+            'unas_shop_id' => $shop->id,
+            'name' => 'Szelesseg',
+            'type' => 'select',
+            'language_id' => $language->id,
+            'order' => 1,
+            'changed' => false,
+        ]);
+
+        $response = $this->getJson('/api/unas/shops/'.$shop->id);
+
+        $response->assertOk()
+            ->assertJsonPath('data.id', $shop->id)
+            ->assertJsonPath('data.shop_products_count', 1)
+            ->assertJsonPath('data.shop_product_categories_count', 1)
+            ->assertJsonPath('data.shop_product_parameters_count', 1);
     }
 
     public function test_cannot_update_unas_product_shop_or_remote_id(): void

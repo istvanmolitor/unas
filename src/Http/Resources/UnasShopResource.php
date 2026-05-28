@@ -19,6 +19,9 @@ class UnasShopResource extends JsonResource
             'api_key' => $this->api_key,
             'warehouse_id' => $this->warehouse_id,
             'warehouse_name' => $this->warehouse?->name,
+            'shop_products_count' => $this->whenCounted('shopProducts'),
+            'shop_product_categories_count' => $this->whenCounted('shopProductCategories'),
+            'shop_product_parameters_count' => $this->whenCounted('shopProductParameters'),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -65,7 +65,11 @@ class UnasShopController
 
     public function show(UnasShop $unasShop): JsonResponse
     {
-        $unasShop->load(['warehouse']);
+        $unasShop->load(['warehouse'])->loadCount([
+            'shopProducts',
+            'shopProductCategories',
+            'shopProductParameters',
+        ]);
 
         return response()->json([
             'data' => new UnasShopResource($unasShop),
