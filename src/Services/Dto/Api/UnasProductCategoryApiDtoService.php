@@ -87,9 +87,9 @@ class UnasProductCategoryApiDtoService extends UnasService
         $endpoint = $this->makeGetCategoryEndpoint($shop->api_key);
         $endpoint->execute();
 
-        $treeBuilder = new CategoryTreeBuilder;
+        $treeBuilder = new TreeBuilder;
         foreach ($endpoint->getResultCategories() as $resultCategory) {
-            $treeBuilder->add((int) $resultCategory['Id'], (int) $resultCategory['Parent']['Id'], $resultCategory);
+            $treeBuilder->add((int) $resultCategory['Id'], $resultCategory, (int) $resultCategory['Parent']['Id']);
         }
 
         foreach ($treeBuilder->getChildrenIds(0) as $id) {
@@ -100,9 +100,12 @@ class UnasProductCategoryApiDtoService extends UnasService
     /**
      * Recursively create categories from tree builder
      */
-    protected function createCategoryFromTree(UnasShop $shop, CategoryTreeBuilder $treeBuilder, ?UnasProductCategory $parent, int $id): void
+    protected function createCategoryFromTree(UnasShop $shop, TreeBuilder $treeBuilder, ?UnasProductCategory $parent, int $id): void
     {
-        $item = $treeBuilder->getItem($id);
+        $item = $treeBuilder->getData($id);
+        if ($item === null) {
+            return;
+        }
         $dto = $this->makeProductCategoryDto($item);
 
         // Create category
@@ -169,6 +172,25 @@ class UnasProductCategoryApiDtoService extends UnasService
         }
 
         return $i;
+    }
+
+    protected function makeProductCategoryDto(array $item): ProductCategoryDto
+    {
+        $dto = new ProductCategoryDto;
+        $dto->id = (int) ($item['Id'] ?? 0);
+        $dto->source = 'unas_api';
+
+        if (isset($item['AutomaticMeta']['Description'])) {
+            $dto->description->set('hu', $item['AutomaticMeta']['Description']);
+        }
+
+        if (isset($item['Image']['Url'])) {
+            $imageDto = new ImageDto;
+            $imageDto->url = $item['Image']['Url'];
+            $dto->image = $imageDto;
+        }
+
+        return $dto;
     }
 
     /**
