@@ -113,7 +113,7 @@ class UnasProductCategoryService extends UnasService
     {
         $path = [];
         foreach ($this->unasProductCategoryRepository->getPathCategories($category) as $pathCategory) {
-            $path[] = (string) $pathCategory;
+            $path[] = (string) $pathCategory->name;
         }
 
         return $path;

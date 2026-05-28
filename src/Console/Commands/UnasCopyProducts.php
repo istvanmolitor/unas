@@ -13,13 +13,13 @@ use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
 use Molitor\Unas\Services\ProductCopyService;
 
-class UnasCreateProducts extends Command
+class UnasCopyProducts extends Command
 {
     private const DIRECTION_MASTER_TO_SHOP = 'master-to-shop';
 
     private const DIRECTION_SHOP_TO_MASTER = 'shop-to-master';
 
-    protected $signature = 'unas:create-products {--shop-id=} {--direction=}';
+    protected $signature = 'unas:copy-products {--shop-id=} {--direction=}';
 
     protected $description = 'Copy products between product master and a selected UNAS shop';
 
