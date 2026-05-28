@@ -17,12 +17,12 @@ class UpdateUnasProductRequest extends FormRequest
     {
         return [
             'sku' => ['sometimes', 'required', 'string', 'max:255'],
-            'unas_shop_id' => ['sometimes', 'required', 'integer', 'exists:unas_shops,id'],
+            'unas_shop_id' => ['prohibited'],
             'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'product_unit_id' => ['nullable', 'integer', 'exists:product_units,id'],
             'price' => ['sometimes', 'required', 'numeric'],
             'stock' => ['sometimes', 'required', 'numeric'],
-            'remote_id' => ['nullable', 'string', 'max:255'],
+            'remote_id' => ['prohibited'],
             'changed' => ['sometimes', 'required', 'boolean'],
         ];
     }

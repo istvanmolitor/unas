@@ -166,5 +166,60 @@ class UnasApiTest extends TestCase
             ->assertJsonPath('data.sku', 'SKU-2')
             ->assertJsonPath('data.unas_shop_id', $shop->id);
     }
+
+    public function test_cannot_update_unas_product_shop_or_remote_id(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $warehouse = Warehouse::query()->create([
+            'is_primary' => true,
+            'name' => 'Kozponti raktar',
+        ]);
+
+        $shop = UnasShop::query()->create([
+            'enabled' => true,
+            'domain' => 'test-shop.hu',
+            'name' => 'Test Shop',
+            'api_key' => 'secret-key',
+            'warehouse_id' => $warehouse->id,
+        ]);
+
+        $otherShop = UnasShop::query()->create([
+            'enabled' => true,
+            'domain' => 'other-shop.hu',
+            'name' => 'Other Shop',
+            'api_key' => 'other-secret-key',
+            'warehouse_id' => $warehouse->id,
+        ]);
+
+        $productUnit = ProductUnit::query()->create([
+            'enabled' => true,
+            'code' => 'db',
+        ]);
+
+        $product = UnasProduct::query()->create([
+            'sku' => 'SKU-3',
+            'unas_shop_id' => $shop->id,
+            'product_unit_id' => $productUnit->id,
+            'price' => 2199,
+            'stock' => 4,
+            'remote_id' => 111,
+            'changed' => false,
+        ]);
+
+        $response = $this->putJson('/api/unas/products/'.$product->id, [
+            'unas_shop_id' => $otherShop->id,
+            'remote_id' => 222,
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['unas_shop_id', 'remote_id']);
+
+        $this->assertDatabaseHas('unas_products', [
+            'id' => $product->id,
+            'unas_shop_id' => $shop->id,
+            'remote_id' => 111,
+        ]);
+    }
 }
 
