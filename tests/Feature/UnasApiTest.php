@@ -62,5 +62,20 @@ class UnasApiTest extends TestCase
             'domain' => 'new-shop.hu',
         ]);
     }
+
+    public function test_warehouse_id_is_required_when_creating_unas_shop(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->postJson('/api/unas/shops', [
+            'enabled' => true,
+            'domain' => 'new-shop.hu',
+            'name' => 'New Shop',
+            'api_key' => 'new-key',
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors(['warehouse_id']);
+    }
 }
 

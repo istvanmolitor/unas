@@ -20,7 +20,7 @@ class StoreUnasShopRequest extends FormRequest
             'domain' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'api_key' => ['required', 'string', 'max:255'],
-            'warehouse_id' => ['nullable', 'integer', 'exists:warehouses,id'],
+            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
         ];
     }
 }
