@@ -56,7 +56,7 @@ class UnasProductController
 
     public function show(UnasProduct $unasProduct): JsonResponse
     {
-        $unasProduct->load(['shop', 'product', 'images', 'attributes', 'parameters']);
+        $unasProduct->load(['shop', 'product']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

@@ -14,7 +14,7 @@ Route::prefix('api/unas')->middleware(['api', 'auth:sanctum'])->group(function (
         ->parameters(['shops' => 'unasShop']);
     Route::apiResource('products', UnasProductController::class)
         ->parameters(['products' => 'unasProduct'])
-        ->only(['index', 'show', 'destroy']);
+        ->only(['index', 'show', 'store', 'update', 'destroy']);
     Route::apiResource('categories', UnasProductCategoryController::class)
         ->parameters(['categories' => 'unasProductCategory'])
         ->only(['index', 'show', 'destroy']);
