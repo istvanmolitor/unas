@@ -21,4 +21,11 @@ class ProductCopyService
 
         return $this->unasProductDtoService->saveDto($unasShop, $productDto);
     }
+
+    public function copyUnasProduct(UnasProduct $unasProduct): Product
+    {
+        $productDto = $this->unasProductDtoService->makeDto($unasProduct);
+
+        return $this->productDtoService->saveDto($productDto);
+    }
 }

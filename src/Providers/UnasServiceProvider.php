@@ -5,6 +5,7 @@ namespace Molitor\Unas\Providers;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Molitor\Product\Events\ProductUpdateEvent;
 use Molitor\Setting\Services\SettingHandler;
+use Molitor\Unas\Console\Commands\UnasCreateProducts;
 use Molitor\Unas\Console\Commands\UnasDownloadOrders;
 use Molitor\Unas\Console\Commands\UnasDownloadProductCategories;
 use Molitor\Unas\Console\Commands\UnasDownloadProductParameters;
@@ -48,6 +49,7 @@ class UnasServiceProvider extends EventServiceProvider
         $this->commands([
             UnasRepairCommand::class,
             UnasSync::class,
+            UnasCreateProducts::class,
             UnasDownloadProducts::class,
             UnasDownloadProductCategories::class,
             UnasDownloadProductParameters::class,
