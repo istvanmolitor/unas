@@ -39,4 +39,9 @@ interface UnasProductCategoryRepositoryInterface
     public function getChangedByShop(UnasShop $shop): Collection;
 
     public function forceDeleteByRemoteId(int $id): bool;
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProductCategory;
 }

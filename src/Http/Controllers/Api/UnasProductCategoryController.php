@@ -11,9 +11,13 @@ use Molitor\Unas\Http\Requests\StoreUnasProductCategoryRequest;
 use Molitor\Unas\Http\Requests\UpdateUnasProductCategoryRequest;
 use Molitor\Unas\Http\Resources\UnasProductCategoryResource;
 use Molitor\Unas\Models\UnasProductCategory;
+use Molitor\Unas\Repositories\UnasProductCategoryRepositoryInterface;
 
 class UnasProductCategoryController
 {
+    public function __construct(
+        private UnasProductCategoryRepositoryInterface $unasProductCategoryRepository
+    ) {}
     public function index(Request $request): JsonResponse
     {
         $query = UnasProductCategory::query()->with(['shop', 'parent']);
@@ -47,7 +51,7 @@ class UnasProductCategoryController
 
     public function store(StoreUnasProductCategoryRequest $request): JsonResponse
     {
-        $category = UnasProductCategory::query()->create($request->validated());
+        $category = $this->unasProductCategoryRepository->create($request->validated());
 
         return response()->json([
             'data' => new UnasProductCategoryResource($category),

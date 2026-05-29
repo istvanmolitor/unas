@@ -225,4 +225,12 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
             ->where('remote_id', $id)
             ->forceDelete();
     }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProductCategory
+    {
+        return $this->category->create($validated);
+    }
 }

@@ -12,9 +12,13 @@ use Molitor\Unas\Http\Requests\StoreUnasShopRequest;
 use Molitor\Unas\Http\Requests\UpdateUnasShopRequest;
 use Molitor\Unas\Http\Resources\UnasShopResource;
 use Molitor\Unas\Models\UnasShop;
+use Molitor\Unas\Repositories\UnasShopRepositoryInterface;
 
 class UnasShopController
 {
+    public function __construct(
+        private UnasShopRepositoryInterface $unasShopRepository
+    ) {}
     public function index(Request $request): JsonResponse
     {
         $query = UnasShop::query()->with(['warehouse']);
@@ -56,7 +60,15 @@ class UnasShopController
 
     public function store(StoreUnasShopRequest $request): JsonResponse
     {
-        $shop = UnasShop::query()->create($request->validated());
+        $validated = $request->validated();
+
+        $shop = $this->unasShopRepository->create(
+            $validated['name'],
+            $validated['domain'],
+            $validated['api_key'],
+            (int) $validated['warehouse_id'],
+            (bool) ($validated['enabled'] ?? true),
+        );
 
         return response()->json([
             'data' => new UnasShopResource($shop),

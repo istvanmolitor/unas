@@ -233,6 +233,14 @@ class UnasProductRepository implements UnasProductRepositoryInterface
             ->forceDelete();
     }
 
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProduct
+    {
+        return $this->shopProduct->create($validated);
+    }
+
     public function getBySku(UnasShop $unasShop, string $sku): ?UnasProduct
     {
         return $this->shopProduct

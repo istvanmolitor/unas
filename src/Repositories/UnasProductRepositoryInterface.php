@@ -50,4 +50,9 @@ interface UnasProductRepositoryInterface
     public function getDeletableByShop(UnasShop $shop): Collection;
 
     public function forceDeleteByRemoteId(int $Id): bool;
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProduct;
 }

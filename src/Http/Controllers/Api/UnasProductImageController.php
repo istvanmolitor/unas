@@ -10,9 +10,14 @@ use Molitor\Unas\Http\Requests\UpdateUnasProductImageRequest;
 use Molitor\Unas\Http\Resources\UnasProductImageResource;
 use Molitor\Unas\Models\UnasProduct;
 use Molitor\Unas\Models\UnasProductImage;
+use Molitor\Unas\Repositories\UnasProductImageRepositoryInterface;
 
 class UnasProductImageController
 {
+    public function __construct(
+        private UnasProductImageRepositoryInterface $unasProductImageRepository
+    ) {}
+
     public function index(UnasProduct $unasProduct): JsonResponse
     {
         $images = $unasProduct->images()->get();
@@ -26,11 +31,12 @@ class UnasProductImageController
     {
         $validated = $request->validated();
 
-        if (!empty($validated['is_main']) && $validated['is_main']) {
-            $unasProduct->images()->update(['is_main' => false]);
-        }
-
-        $image = $unasProduct->images()->create($validated);
+        $image = $this->unasProductImageRepository->create(
+            $unasProduct,
+            $validated['image_url'],
+            (bool) ($validated['is_main'] ?? false),
+            $validated['sort'] ?? null,
+        );
 
         return response()->json([
             'data' => new UnasProductImageResource($image),
@@ -41,7 +47,7 @@ class UnasProductImageController
     {
         $validated = $request->validated();
 
-        if (!empty($validated['is_main']) && $validated['is_main']) {
+        if (! empty($validated['is_main']) && $validated['is_main']) {
             $unasProduct->images()->where('id', '!=', $image->id)->update(['is_main' => false]);
         }
 

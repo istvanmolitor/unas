@@ -34,4 +34,17 @@ class UnasProductImageRepository implements UnasProductImageRepositoryInterface
             'alt' => $alt,
         ]);
     }
+
+    public function create(UnasProduct $unasProduct, string $imageUrl, bool $isMain, ?int $sort): UnasProductImage
+    {
+        if ($isMain) {
+            $unasProduct->images()->update(['is_main' => false]);
+        }
+
+        return $unasProduct->images()->create([
+            'image_url' => $imageUrl,
+            'is_main' => $isMain,
+            'sort' => $sort,
+        ]);
+    }
 }

@@ -14,4 +14,6 @@ interface UnasShopRepositoryInterface
     public function delete(UnasShop $shop): void;
 
     public function getById(int $shopId): ?UnasShop;
+
+    public function create(string $name, string $domain, string $apiKey, int $warehouseId, bool $enabled): UnasShop;
 }

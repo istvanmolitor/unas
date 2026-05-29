@@ -28,4 +28,9 @@ interface UnasProductParameterRepositoryInterface
     public function getByRemoteId(UnasShop $shop, int $remoteId): ?UnasProductParameter;
 
     public function getByName(UnasShop $shop, string $name, Language $language): ?UnasProductParameter;
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProductParameter;
 }

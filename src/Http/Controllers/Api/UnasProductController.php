@@ -11,9 +11,13 @@ use Molitor\Unas\Http\Requests\StoreUnasProductRequest;
 use Molitor\Unas\Http\Requests\UpdateUnasProductRequest;
 use Molitor\Unas\Http\Resources\UnasProductResource;
 use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Repositories\UnasProductRepositoryInterface;
 
 class UnasProductController
 {
+    public function __construct(
+        private UnasProductRepositoryInterface $unasProductRepository
+    ) {}
     public function index(Request $request): JsonResponse
     {
         $query = UnasProduct::query()->with(['shop', 'product']);
@@ -47,7 +51,7 @@ class UnasProductController
 
     public function store(StoreUnasProductRequest $request): JsonResponse
     {
-        $unasProduct = UnasProduct::query()->create($request->validated());
+        $unasProduct = $this->unasProductRepository->create($request->validated());
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

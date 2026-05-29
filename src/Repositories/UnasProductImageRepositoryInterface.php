@@ -8,4 +8,6 @@ use Molitor\Unas\Models\UnasProductImage;
 interface UnasProductImageRepositoryInterface
 {
     public function addUrl(UnasProduct $product, string $url, string $alt): UnasProductImage;
+
+    public function create(UnasProduct $unasProduct, string $imageUrl, bool $isMain, ?int $sort): UnasProductImage;
 }

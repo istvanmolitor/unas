@@ -117,4 +117,12 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
             ->where('language_id', $language->id)
             ->first();
     }
+
+    /**
+     * @param array<string, mixed> $validated
+     */
+    public function create(array $validated): UnasProductParameter
+    {
+        return $this->shopProductParameter->create($validated);
+    }
 }

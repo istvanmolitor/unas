@@ -11,9 +11,13 @@ use Molitor\Unas\Http\Requests\StoreUnasProductParameterRequest;
 use Molitor\Unas\Http\Requests\UpdateUnasProductParameterRequest;
 use Molitor\Unas\Http\Resources\UnasProductParameterResource;
 use Molitor\Unas\Models\UnasProductParameter;
+use Molitor\Unas\Repositories\UnasProductParameterRepositoryInterface;
 
 class UnasProductParameterController
 {
+    public function __construct(
+        private UnasProductParameterRepositoryInterface $unasProductParameterRepository
+    ) {}
     public function index(Request $request): JsonResponse
     {
         $query = UnasProductParameter::query()->with(['shop', 'language']);
@@ -47,7 +51,7 @@ class UnasProductParameterController
 
     public function store(StoreUnasProductParameterRequest $request): JsonResponse
     {
-        $parameter = UnasProductParameter::query()->create($request->validated());
+        $parameter = $this->unasProductParameterRepository->create($request->validated());
 
         return response()->json([
             'data' => new UnasProductParameterResource($parameter),

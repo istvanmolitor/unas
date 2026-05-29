@@ -48,4 +48,15 @@ class UnasShopRepository implements UnasShopRepositoryInterface
     {
         return $this->shop->find($shopId);
     }
+
+    public function create(string $name, string $domain, string $apiKey, int $warehouseId, bool $enabled): UnasShop
+    {
+        return $this->shop->create([
+            'name' => $name,
+            'domain' => $domain,
+            'api_key' => $apiKey,
+            'warehouse_id' => $warehouseId,
+            'enabled' => $enabled,
+        ]);
+    }
 }
