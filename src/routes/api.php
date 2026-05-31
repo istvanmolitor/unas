@@ -10,7 +10,7 @@ use Molitor\Unas\Http\Controllers\Api\UnasProductImageController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductParameterController;
 use Molitor\Unas\Http\Controllers\Api\UnasShopController;
 
-Route::prefix('api/unas')->middleware(['api', 'auth:sanctum'])->group(function (): void {
+Route::prefix('api/unas')->middleware(['api', 'auth:sanctum', 'permission:unas'])->group(function (): void {
     Route::get('shops/options', [UnasShopController::class, 'options']);
     Route::apiResource('shops', UnasShopController::class)
         ->parameters(['shops' => 'unasShop']);

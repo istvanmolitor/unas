@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Molitor\Unas\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class StoreUnasProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return Gate::allows('acl', 'unas');
     }
 
     public function rules(): array
