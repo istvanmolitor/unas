@@ -18,7 +18,7 @@ class UnasSeeder extends Seeder
         try {
             /** @var AclManagementService $aclService */
             $aclService = app(AclManagementService::class);
-            $aclService->createPermission('unas', 'Unas áruházak kezelése', 'admin');
+            $aclService->createPermission('UNAS', 'Unas áruházak kezelése', 'admin', 'UNAS');
         } catch (PermissionException $e) {
             $this->command->error($e->getMessage());
         }
