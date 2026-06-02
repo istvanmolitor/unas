@@ -20,7 +20,7 @@ class UnasProductController
     ) {}
     public function index(Request $request): JsonResponse
     {
-        $query = UnasProduct::query()->with(['shop', 'product', 'mainImage', 'images']);
+        $query = UnasProduct::query()->with(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
 
         if ($shopId = $request->input('unas_shop_id')) {
             $query->where('unas_shop_id', $shopId);
@@ -51,7 +51,12 @@ class UnasProductController
 
     public function store(StoreUnasProductRequest $request): JsonResponse
     {
-        $unasProduct = $this->unasProductRepository->create($request->validated());
+        $validated = $request->validated();
+
+        $unasProduct = $this->unasProductRepository->create($validated);
+        $unasProduct->setRequestTranslations($validated);
+        $unasProduct->save();
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),
@@ -60,7 +65,7 @@ class UnasProductController
 
     public function show(UnasProduct $unasProduct): JsonResponse
     {
-        $unasProduct->load(['shop', 'product', 'mainImage', 'images']);
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),
@@ -69,7 +74,12 @@ class UnasProductController
 
     public function update(UpdateUnasProductRequest $request, UnasProduct $unasProduct): JsonResponse
     {
-        $unasProduct->update($request->validated());
+        $validated = $request->validated();
+
+        $unasProduct->update($validated);
+        $unasProduct->setRequestTranslations($validated);
+        $unasProduct->save();
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

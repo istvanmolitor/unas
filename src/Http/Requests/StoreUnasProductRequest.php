@@ -25,6 +25,9 @@ class StoreUnasProductRequest extends FormRequest
             'stock' => ['required', 'numeric'],
             'remote_id' => ['nullable', 'string', 'max:255'],
             'changed' => ['required', 'boolean'],
+            'translations' => ['nullable', 'array'],
+            'translations.*.name' => ['required', 'string', 'max:255'],
+            'translations.*.description' => ['nullable', 'string'],
         ];
     }
 }

@@ -25,6 +25,9 @@ class UpdateUnasProductRequest extends FormRequest
             'stock' => ['sometimes', 'required', 'numeric'],
             'remote_id' => ['prohibited'],
             'changed' => ['sometimes', 'required', 'boolean'],
+            'translations' => ['nullable', 'array'],
+            'translations.*.name' => ['required', 'string', 'max:255'],
+            'translations.*.description' => ['nullable', 'string'],
         ];
     }
 }

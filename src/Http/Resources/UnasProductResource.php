@@ -6,6 +6,7 @@ namespace Molitor\Unas\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Molitor\Language\Http\Resources\TranslationsResource;
 
 class UnasProductResource extends JsonResource
 {
@@ -19,16 +20,21 @@ class UnasProductResource extends JsonResource
         return [
             'id' => $this->id,
             'sku' => $this->sku,
+            'name' => $this->name,
+            'description' => $this->description,
             'unas_shop_id' => $this->unas_shop_id,
             'shop_name' => $this->shop?->name,
             'product_id' => $this->product_id,
             'product_title' => $this->product?->title,
             'main_image_url' => $mainImageUrl,
             'product_unit_id' => $this->product_unit_id,
+            'product_unit_name' => $this->productUnit?->name,
+            'product_unit_short_name' => $this->productUnit?->short_name,
             'price' => $this->price,
             'stock' => $this->stock,
             'remote_id' => $this->remote_id,
             'changed' => $this->changed,
+            'translations' => new TranslationsResource($this->getTranslations()),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
