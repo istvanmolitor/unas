@@ -20,7 +20,7 @@ class UnasProductController
     ) {}
     public function index(Request $request): JsonResponse
     {
-        $query = UnasProduct::query()->with(['shop', 'product']);
+        $query = UnasProduct::query()->with(['shop', 'product', 'mainImage', 'images']);
 
         if ($shopId = $request->input('unas_shop_id')) {
             $query->where('unas_shop_id', $shopId);
@@ -60,7 +60,7 @@ class UnasProductController
 
     public function show(UnasProduct $unasProduct): JsonResponse
     {
-        $unasProduct->load(['shop', 'product']);
+        $unasProduct->load(['shop', 'product', 'mainImage', 'images']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

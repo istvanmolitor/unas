@@ -11,6 +11,7 @@ use Molitor\Language\Models\Language;
 use Molitor\Product\Models\ProductUnit;
 use Molitor\Stock\Models\Warehouse;
 use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Models\UnasProductImage;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasProductParameter;
 use Molitor\Unas\Models\UnasShop;
@@ -168,6 +169,58 @@ class UnasApiTest extends TestCase
             ->assertJsonPath('data.id', $product->id)
             ->assertJsonPath('data.sku', 'SKU-2')
             ->assertJsonPath('data.unas_shop_id', $shop->id);
+    }
+
+    public function test_products_index_returns_first_image_when_main_image_is_not_marked(): void
+    {
+        Sanctum::actingAs(User::factory()->create());
+
+        $warehouse = Warehouse::query()->create([
+            'is_primary' => true,
+            'name' => 'Kozponti raktar',
+        ]);
+
+        $shop = UnasShop::query()->create([
+            'enabled' => true,
+            'domain' => 'test-shop.hu',
+            'name' => 'Test Shop',
+            'api_key' => 'secret-key',
+            'warehouse_id' => $warehouse->id,
+        ]);
+
+        $productUnit = ProductUnit::query()->create([
+            'enabled' => true,
+            'code' => 'db',
+        ]);
+
+        $product = UnasProduct::query()->create([
+            'sku' => 'SKU-IMAGE-1',
+            'unas_shop_id' => $shop->id,
+            'product_unit_id' => $productUnit->id,
+            'price' => 1000,
+            'stock' => 10,
+            'changed' => false,
+        ]);
+
+        UnasProductImage::query()->create([
+            'unas_product_id' => $product->id,
+            'image_url' => 'https://example.com/image-1.jpg',
+            'is_main' => false,
+            'sort' => 0,
+        ]);
+
+        UnasProductImage::query()->create([
+            'unas_product_id' => $product->id,
+            'image_url' => 'https://example.com/image-2.jpg',
+            'is_main' => false,
+            'sort' => 1,
+        ]);
+
+        $response = $this->getJson('/api/unas/products?unas_shop_id='.$shop->id);
+
+        $response->assertOk()
+            ->assertJsonPath('data.0.id', $product->id)
+            ->assertJsonPath('data.0.main_image_url', 'https://example.com/image-1.jpg');
     }
 
     public function test_can_show_unas_shop_with_related_counts(): void

@@ -95,6 +95,7 @@ class UnasProductDtoService
             }
 
             $unasProductImage->sort = $index;
+            $unasProductImage->is_main = ($index === 0);
             $unasProductImage->alt = $imageDto->alt;
             $unasProductImage->save();
         }

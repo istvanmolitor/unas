@@ -27,9 +27,12 @@ class UnasProductImageRepository implements UnasProductImageRepositoryInterface
 
     public function addUrl(UnasProduct $product, string $url, string $alt): UnasProductImage
     {
+        $isMain = ! $this->productImage->where('unas_product_id', $product->id)->exists();
+
         return $this->productImage->create([
             'unas_product_id' => $product->id,
-            'url' => $url,
+            'image_url' => $url,
+            'is_main' => $isMain,
             'sort' => $this->getNextShort($product),
             'alt' => $alt,
         ]);
