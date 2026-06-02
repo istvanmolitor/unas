@@ -15,10 +15,12 @@ class UnasSeeder extends Seeder
      */
     public function run()
     {
+        $permissionGroupName = 'UNAS';
+
         try {
             /** @var AclManagementService $aclService */
             $aclService = app(AclManagementService::class);
-            $aclService->createPermission('UNAS', 'Unas áruházak kezelése', 'admin', 'UNAS');
+            $aclService->createPermission('unas', 'Unas áruházak kezelése', 'admin', $permissionGroupName);
         } catch (PermissionException $e) {
             $this->command->error($e->getMessage());
         }
