@@ -81,6 +81,7 @@ class UnasShopController
             'shopProducts',
             'shopProductCategories',
             'shopProductParameters',
+            'shopOrders',
         ]);
 
         return response()->json([

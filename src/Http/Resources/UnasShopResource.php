@@ -22,6 +22,7 @@ class UnasShopResource extends JsonResource
             'shop_products_count' => $this->whenCounted('shopProducts'),
             'shop_product_categories_count' => $this->whenCounted('shopProductCategories'),
             'shop_product_parameters_count' => $this->whenCounted('shopProductParameters'),
+            'shop_orders_count' => $this->whenCounted('shopOrders'),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -34,6 +34,11 @@ class UnasShop extends Model
         return $this->hasMany(UnasProductParameter::class, 'unas_shop_id');
     }
 
+    public function shopOrders(): HasMany
+    {
+        return $this->hasMany(UnasOrder::class, 'unas_shop_id');
+    }
+
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class, 'warehouse_id');
