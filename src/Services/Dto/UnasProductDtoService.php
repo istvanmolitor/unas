@@ -2,6 +2,7 @@
 
 namespace Molitor\Unas\Services\Dto;
 
+use Molitor\Product\Dto\ImageDto;
 use Molitor\Product\Dto\ProductDto;
 use Molitor\Product\Services\Dto\ProductUnitDtoService;
 use Molitor\Unas\Models\UnasProduct;
@@ -26,6 +27,15 @@ class UnasProductDtoService
         $productDto->name = $unasProduct->getAttributeDto('name');
         $productDto->price = $unasProduct->price;
         $productDto->currency = 'HUF';
+
+        /** @var UnasProductImage $image */
+        foreach ($unasProduct->images as $image) {
+            $imageDto = new ImageDto;
+            $imageDto->url = (string) $image->image_url;
+            $imageDto->alt = $image->getAttributeDto('alt');
+            $imageDto->title = $image->getAttributeDto('title');
+            $productDto->addImage($imageDto);
+        }
 
         return $productDto;
     }
