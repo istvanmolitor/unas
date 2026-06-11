@@ -21,6 +21,8 @@ class StoreUnasProductRequest extends FormRequest
             'unas_shop_id' => ['required', 'integer', 'exists:unas_shops,id'],
             'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'product_unit_id' => ['nullable', 'integer', 'exists:product_units,id'],
+            'unas_product_category_ids' => ['nullable', 'array'],
+            'unas_product_category_ids.*' => ['integer', 'distinct', 'exists:unas_product_categories,id'],
             'price' => ['required', 'numeric'],
             'stock' => ['required', 'numeric'],
             'remote_id' => ['nullable', 'string', 'max:255'],

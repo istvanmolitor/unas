@@ -32,6 +32,7 @@ class UnasProductResource extends JsonResource
             'product_unit_short_name' => $this->productUnit?->short_name,
             'price' => $this->price,
             'stock' => $this->stock,
+            'unas_product_category_ids' => $this->whenLoaded('shopProductCategories', fn (): array => $this->shopProductCategories->pluck('id')->values()->all()),
             'remote_id' => $this->remote_id,
             'changed' => $this->changed,
             'translations' => new TranslationsResource($this->getTranslations()),

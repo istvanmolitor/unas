@@ -20,7 +20,7 @@ class UnasProductController
     ) {}
     public function index(Request $request): JsonResponse
     {
-        $query = UnasProduct::query()->with(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
+        $query = UnasProduct::query()->with(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations', 'shopProductCategories']);
 
         if ($shopId = $request->input('unas_shop_id')) {
             $query->where('unas_shop_id', $shopId);
@@ -52,11 +52,16 @@ class UnasProductController
     public function store(StoreUnasProductRequest $request): JsonResponse
     {
         $validated = $request->validated();
+        $categoryIds = $validated['unas_product_category_ids'] ?? null;
+        unset($validated['unas_product_category_ids']);
 
         $unasProduct = $this->unasProductRepository->create($validated);
+        if (is_array($categoryIds)) {
+            $unasProduct->shopProductCategories()->sync($categoryIds);
+        }
         $unasProduct->setRequestTranslations($validated);
         $unasProduct->save();
-        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations', 'shopProductCategories']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),
@@ -65,7 +70,7 @@ class UnasProductController
 
     public function show(UnasProduct $unasProduct): JsonResponse
     {
-        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations', 'shopProductCategories']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),
@@ -75,11 +80,16 @@ class UnasProductController
     public function update(UpdateUnasProductRequest $request, UnasProduct $unasProduct): JsonResponse
     {
         $validated = $request->validated();
+        $categoryIds = $validated['unas_product_category_ids'] ?? null;
+        unset($validated['unas_product_category_ids']);
 
         $unasProduct->update($validated);
+        if (is_array($categoryIds)) {
+            $unasProduct->shopProductCategories()->sync($categoryIds);
+        }
         $unasProduct->setRequestTranslations($validated);
         $unasProduct->save();
-        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations']);
+        $unasProduct->load(['shop', 'product', 'productUnit', 'mainImage', 'images', 'translations', 'shopProductCategories']);
 
         return response()->json([
             'data' => new UnasProductResource($unasProduct),

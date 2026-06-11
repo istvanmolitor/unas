@@ -21,6 +21,8 @@ class UpdateUnasProductRequest extends FormRequest
             'unas_shop_id' => ['prohibited'],
             'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'product_unit_id' => ['nullable', 'integer', 'exists:product_units,id'],
+            'unas_product_category_ids' => ['nullable', 'array'],
+            'unas_product_category_ids.*' => ['integer', 'distinct', 'exists:unas_product_categories,id'],
             'price' => ['sometimes', 'required', 'numeric'],
             'stock' => ['sometimes', 'required', 'numeric'],
             'remote_id' => ['prohibited'],
