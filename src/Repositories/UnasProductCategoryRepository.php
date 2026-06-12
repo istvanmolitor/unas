@@ -193,7 +193,7 @@ class UnasProductCategoryRepository implements UnasProductCategoryRepositoryInte
 
     public function forceDeleteByShop(UnasShop $shop): void
     {
-        $this->category->where('unas_shop_id', $shop->id)->forceDelete();
+        $this->category->withTrashed()->where('unas_shop_id', $shop->id)->forceDelete();
     }
 
     public function isChildOf(UnasProductCategory $parent, UnasProductCategory $category): bool

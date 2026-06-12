@@ -209,7 +209,7 @@ class UnasProductRepository implements UnasProductRepositoryInterface
 
     public function forceDeleteByShop(UnasShop $shop): void
     {
-        $this->shopProduct->where('unas_shop_id', $shop->id)->forceDelete();
+        $this->shopProduct->withTrashed()->where('unas_shop_id', $shop->id)->forceDelete();
     }
 
     public function getChangedByShop(UnasShop $shop): Collection

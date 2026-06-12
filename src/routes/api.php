@@ -8,10 +8,21 @@ use Molitor\Unas\Http\Controllers\Api\UnasProductCategoryController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductImageController;
 use Molitor\Unas\Http\Controllers\Api\UnasProductParameterController;
+use Molitor\Unas\Http\Controllers\Api\UnasShopActionController;
 use Molitor\Unas\Http\Controllers\Api\UnasShopController;
 
 Route::prefix('api/unas')->middleware(['api', 'auth:sanctum', 'permission:unas'])->group(function (): void {
     Route::get('shops/options', [UnasShopController::class, 'options']);
+    Route::prefix('shops/{unasShop}/actions')->group(function (): void {
+        Route::post('download-products', [UnasShopActionController::class, 'downloadProducts']);
+        Route::post('download-categories', [UnasShopActionController::class, 'downloadCategories']);
+        Route::post('download-parameters', [UnasShopActionController::class, 'downloadParameters']);
+        Route::post('download-orders', [UnasShopActionController::class, 'downloadOrders']);
+        Route::delete('clear-products', [UnasShopActionController::class, 'clearProducts']);
+        Route::delete('clear-categories', [UnasShopActionController::class, 'clearCategories']);
+        Route::delete('clear-parameters', [UnasShopActionController::class, 'clearParameters']);
+        Route::delete('clear-orders', [UnasShopActionController::class, 'clearOrders']);
+    });
     Route::apiResource('shops', UnasShopController::class)
         ->parameters(['shops' => 'unasShop']);
     Route::apiResource('products', UnasProductController::class)

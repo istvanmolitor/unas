@@ -24,6 +24,11 @@ class UnasOrderRepository implements UnasOrderRepositoryInterface
         $this->unasOrder->where('unas_shop_id', $shop->id)->delete();
     }
 
+    public function forceDeleteByShop(UnasShop $shop): void
+    {
+        $this->unasOrder->withTrashed()->where('unas_shop_id', $shop->id)->forceDelete();
+    }
+
     public function getCountByShop(UnasShop $shop): int
     {
         return $this->unasOrder->where('unas_shop_id', $shop->id)->count();

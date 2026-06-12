@@ -11,5 +11,7 @@ interface UnasOrderRepositoryInterface
 
     public function deleteByShop(UnasShop $shop): void;
 
+    public function forceDeleteByShop(UnasShop $shop): void;
+
     public function getCountByShop(UnasShop $shop): int;
 }

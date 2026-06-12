@@ -93,7 +93,7 @@ class UnasProductParameterRepository implements UnasProductParameterRepositoryIn
 
     public function forceDeleteByShop(UnasShop $shop): void
     {
-        $this->shopProductParameter->where('unas_shop_id', $shop->id)->forceDelete();
+        $this->shopProductParameter->withTrashed()->where('unas_shop_id', $shop->id)->forceDelete();
     }
 
     public function forceDeleteByRemoteId(int $id): bool
