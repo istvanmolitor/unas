@@ -45,6 +45,8 @@ interface UnasProductRepositoryInterface
 
     public function forceDeleteByShop(UnasShop $shop): void;
 
+    public function clearProductsForShop(UnasShop $shop): void;
+
     public function getChangedByShop(UnasShop $shop): Collection;
 
     public function getDeletableByShop(UnasShop $shop): Collection;

@@ -4,15 +4,10 @@ declare(strict_types=1);
 
 namespace Molitor\Unas\Http\Controllers\Api;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\JsonResponse;
 use Molitor\Unas\Jobs\DownloadUnasOrdersJob;
 use Molitor\Unas\Jobs\DownloadUnasProductCategoriesJob;
 use Molitor\Unas\Jobs\DownloadUnasProductParametersJob;
-use Molitor\Unas\Models\UnasProduct;
-use Molitor\Unas\Models\UnasProductAttribute;
-use Molitor\Unas\Models\UnasProductImage;
-use Molitor\Unas\Models\UnasProductTranslation;
 use Molitor\Unas\Models\UnasShop;
 use Molitor\Unas\Repositories\UnasOrderRepositoryInterface;
 use Molitor\Unas\Repositories\UnasProductCategoryProductRepositoryInterface;
@@ -69,17 +64,7 @@ class UnasShopActionController
 
     public function clearProducts(UnasShop $unasShop): JsonResponse
     {
-        $productIds = UnasProduct::withTrashed()
-            ->where('unas_shop_id', $unasShop->id)
-            ->pluck('id');
-
-        if ($productIds->isNotEmpty()) {
-            UnasProductTranslation::whereIn('unas_product_id', $productIds)->delete();
-            UnasProductImage::whereIn('unas_product_id', $productIds)->delete();
-            UnasProductAttribute::whereIn('unas_product_id', $productIds)->delete();
-            DB::table('unas_product_parameter_values')->whereIn('unas_product_id', $productIds)->delete();
-        }
-
+        $this->unasProductRepository->clearProductsForShop($unasShop);
         $this->unasProductCategoryProductRepository->deleteByShop($unasShop);
         $this->unasProductRepository->forceDeleteByShop($unasShop);
 

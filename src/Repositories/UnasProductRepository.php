@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Molitor\Unas\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Molitor\Currency\Repositories\CurrencyRepositoryInterface;
 use Molitor\Product\Models\Product;
 use Molitor\Product\Models\ProductUnit;
 use Molitor\Product\Repositories\ProductRepository;
 use Molitor\Unas\Models\UnasProduct;
+use Molitor\Unas\Models\UnasProductAttribute;
 use Molitor\Unas\Models\UnasProductCategory;
 use Molitor\Unas\Models\UnasProductCategoryProduct;
+use Molitor\Unas\Models\UnasProductImage;
+use Molitor\Unas\Models\UnasProductTranslation;
 use Molitor\Unas\Models\UnasShop;
 
 class UnasProductRepository implements UnasProductRepositoryInterface
@@ -210,6 +214,21 @@ class UnasProductRepository implements UnasProductRepositoryInterface
     public function forceDeleteByShop(UnasShop $shop): void
     {
         $this->shopProduct->withTrashed()->where('unas_shop_id', $shop->id)->forceDelete();
+    }
+
+    public function clearProductsForShop(UnasShop $shop): void
+    {
+        $productIds = $this->shopProduct
+            ->withTrashed()
+            ->where('unas_shop_id', $shop->id)
+            ->pluck('id');
+
+        if ($productIds->isNotEmpty()) {
+            UnasProductTranslation::whereIn('unas_product_id', $productIds)->delete();
+            UnasProductImage::whereIn('unas_product_id', $productIds)->delete();
+            UnasProductAttribute::whereIn('unas_product_id', $productIds)->delete();
+            DB::table('unas_product_parameter_values')->whereIn('unas_product_id', $productIds)->delete();
+        }
     }
 
     public function getChangedByShop(UnasShop $shop): Collection
